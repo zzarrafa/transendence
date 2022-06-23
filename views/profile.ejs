@@ -1,0 +1,8 @@
+<%- include('./header.ejs') %>
+<p>ID: <%= user.id %></p>
+<p>login: <%= user.username %></p>
+<p>Name: <%= user.displayName %></p>
+<p>Emails: <%= user.emails[0].value %></p>
+<p>Phone: <%= user.phoneNumbers[0].value %><p>
+<img src=<%= user.photos[0].value %> width="300px">
+<%- include('./footer.ejs') %>

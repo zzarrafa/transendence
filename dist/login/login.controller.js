@@ -12,7 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginController = void 0;
 const common_1 = require("@nestjs/common");
 const ft_oauth_guard_1 = require("./guards/ft-oauth.guard");
+const login_service_1 = require("./login.service");
 let LoginController = class LoginController {
+    constructor(loingService) {
+        this.loingService = loingService;
+    }
     ftAuth() {
         return;
     }
@@ -36,7 +40,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], LoginController.prototype, "ftAuthCallback", null);
 LoginController = __decorate([
-    (0, common_1.Controller)('login')
+    (0, common_1.Controller)('login'),
+    __metadata("design:paramtypes", [login_service_1.LoginService])
 ], LoginController);
 exports.LoginController = LoginController;
 //# sourceMappingURL=login.controller.js.map

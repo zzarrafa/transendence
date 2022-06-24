@@ -3,7 +3,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { LoginModule } from './login/login.module';
-
+import { LoginService } from './login/login.service';
+import { PrismaModule } from './prisma/prisma.module';
+import {JwtService} from '@nestjs/jwt';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -11,7 +13,10 @@ import { LoginModule } from './login/login.module';
     }),
     LoginModule,
     HttpModule,
+    PrismaModule,
+    ConfigModule.forRoot({isGlobal: true}),
   ],
   controllers: [AppController],
+  providers: [LoginService, JwtService],
 })
 export class AppModule {}

@@ -14,8 +14,8 @@ const common_1 = require("@nestjs/common");
 const ft_oauth_guard_1 = require("./guards/ft-oauth.guard");
 const login_service_1 = require("./login.service");
 let LoginController = class LoginController {
-    constructor(loingService) {
-        this.loingService = loingService;
+    constructor(loginService) {
+        this.loginService = loginService;
     }
     ftAuth() {
         return;

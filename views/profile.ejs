@@ -1,21 +1,23 @@
 <%- include('./header.ejs') %> 
 <p>ID: <%= user.id %></p>
-<p>login: <%= user.username %></p>
+<p>login: <%= user.login %></p>
 <p>Name: <%= user.displayName %></p>
-<p>Emails: <%= user.emails[0].value %></p>
-<p>Phone: <%= user.phoneNumbers[0].value %><p>
-<img src=<%= user.photos[0].value %> width="300px">
-<form id="register" method="post" action="/user/register">    
+<p>Emails: <%= user.email %></p>
+<img src=<%= user.picture %> width="300px">
+<!-- <form id="register" method="post" action="/user/register">    
     <label><b>displayName   
     </b>    
     </label>    
     <input type="text" name="displayName" id="displayName" placeholder="displayName">    
     <br><br>    
-    <label><b>Pic     
-    </b>    
-    </label>    
-    <input type="image" name="pic" id="pic" placeholder="image">    
-    <br><br>    
+    <label><b>choose file
+    </b>
+    <br>
+    </label>
+    <input type="file" id="picture" name="picture">    
+    <br>
+    <br>
     <input type="submit" name="button" id="submit" value="Register">
-</form> 
+</form>
+  -->
 <%- include('./footer.ejs') %>

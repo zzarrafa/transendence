@@ -1,7 +1,7 @@
 import { LoginService } from './login.service';
 export declare class LoginController {
-    private loingService;
-    constructor(loingService: LoginService);
+    private loginService;
+    constructor(loginService: LoginService);
     ftAuth(): void;
     ftAuthCallback(): void;
 }

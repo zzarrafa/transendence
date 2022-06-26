@@ -1,0 +1,5 @@
+<%- include('./header.ejs') %> <% if (user ) { %>
+    <p>Welcome! Please <a href="/user/register">register.</a></p>
+    <% } else { %>
+    <p>/Welcome! <%= user.displayName %> .</a></p>
+    <% } %> <%- include('./footer.ejs') %>

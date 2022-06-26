@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginService = void 0;
 const common_1 = require("@nestjs/common");
@@ -27,18 +27,48 @@ let LoginService = class LoginService {
         this.jwt = jwt;
         this.config = config;
     }
-    async login(logDto, userr) {
-        const users = await this.prisma.user.create({
-            data: {
-                displayName: logDto.displayName,
-                picture: this.isEmpty(logDto.picture) ? userr.photos[0].value : logDto.picture,
+    async login(logDto, userr, req, rep) {
+        const users = await this.prisma.user.findUnique({
+            where: {
                 email: userr.emails[0].value,
-                fullName: userr.displayName,
-                login: userr.username,
-                id: +userr.id,
             },
         });
-        return this.signToken(users.id, users.displayName);
+        if (users) {
+            throw new common_1.ForbiddenException('already exist');
+        }
+        const userss = await this.prisma.user.findUnique({
+            where: {
+                displayName: logDto.displayName,
+            },
+        });
+        if (userss) {
+            throw new common_1.ForbiddenException('name already ');
+        }
+        else {
+            let users = await this.prisma.user.create({
+                data: {
+                    displayName: logDto.displayName,
+                    picture: this.isEmpty(logDto.picture) ? userr.photos[0].value : logDto.picture,
+                    email: userr.emails[0].value,
+                    fullName: userr.displayName,
+                    login: userr.username
+                },
+            });
+            return this.signToken(users.id, users.displayName);
+        }
+    }
+    async isRegisterd(userr) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: userr.emails[0].value,
+            },
+        });
+        if (user) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     async signToken(userId, displayName) {
         const payload = {
@@ -59,11 +89,17 @@ let LoginService = class LoginService {
     }
 };
 __decorate([
-    __param(1, (0, user_decorator_1.User)()),
+    __param(1, (0, user_decorator_1.Userr)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], LoginService.prototype, "login", null);
+__decorate([
+    __param(0, (0, user_decorator_1.Userr)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], LoginService.prototype, "isRegisterd", null);
 LoginService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService])

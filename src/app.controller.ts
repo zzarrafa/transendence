@@ -9,22 +9,24 @@ import {
   Post,
   Body,
 } from '@nestjs/common';
-import { User } from './login/user.decorator';
+import { Userr } from './login/user.decorator';
 import { Profile } from 'passport-42';
 import { AuthenticatedGuard } from './login/guards/authenticated.guard';
-import { Request } from 'express';
 import { HttpService } from '@nestjs/axios';
 import { LogDto } from './login/dto';
 import {LoginService} from './login/login.service';
+import { Request, Response } from 'express';
+import {User} from '@prisma/client';
+import {PrismaService} from "src/prisma/prisma.service";
 
 
 @Controller()
 export class AppController {
-  constructor(private readonly httpService: HttpService, private loginService: LoginService) {}
+  constructor(private readonly httpService: HttpService, private loginService: LoginService,private prisma: PrismaService) {}
 
   @Get()
   @Render('home')
-  home(@User() user: Profile) {
+  home(@Userr() user: Profile) {
     return { user };
   }
 
@@ -37,7 +39,13 @@ export class AppController {
   @Get('profile')
   @UseGuards(AuthenticatedGuard)
   @Render('profile')
-  profile(@User() user: Profile) {
+  async profile(@Userr() userr : Profile) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+          email: userr.emails[0].value,
+      },
+  });
+    console.log(user.picture);
     return { user };
   }
 
@@ -48,10 +56,23 @@ export class AppController {
   }
 
   
-  
   @Post('user/register')
   @UseGuards(AuthenticatedGuard)
-  login(@Body() dto: LogDto,@User() user: Profile) {
-    console.log('ok');
-      return this.loginService.login(dto,user);}
+  @Redirect('/profile')
+  login(@Body() dto: LogDto,@Userr() user: Profile, req: Request, rep: Response) {
+      return this.loginService.login(dto,user,req,rep);}
+
+
+  @Get('/hey')
+  @UseGuards(AuthenticatedGuard)
+  @Render('hey')
+  async hey (@Userr() userr : Profile)
+  {
+    const user = await this.prisma.user.findUnique({
+      where: {
+          email: userr.emails[0].value,
+      },
+  });
+    return user;
+}
 }

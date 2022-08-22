@@ -19,7 +19,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const dto_1 = require("./dto");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
-const user_decorator_1 = require("./user.decorator");
+const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
 let LoginService = class LoginService {
     constructor(prisma, jwt, config) {
@@ -27,7 +27,7 @@ let LoginService = class LoginService {
         this.jwt = jwt;
         this.config = config;
     }
-    async login(logDto, userr, req, rep) {
+    async login(logDto, userr) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -42,7 +42,7 @@ let LoginService = class LoginService {
             },
         });
         if (userss) {
-            throw new common_1.ForbiddenException('name already ');
+            throw new common_1.ForbiddenException('name already used');
         }
         else {
             let users = await this.prisma.user.create({
@@ -91,7 +91,7 @@ let LoginService = class LoginService {
 __decorate([
     __param(1, (0, user_decorator_1.Userr)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
+    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object]),
     __metadata("design:returntype", Promise)
 ], LoginService.prototype, "login", null);
 __decorate([

@@ -2,8 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Profile, VerifyCallback } from 'passport-42';
 declare const FtStrategy_base: new (...args: any[]) => any;
 export declare class FtStrategy extends FtStrategy_base {
-    private readonly configService;
-    constructor(configService: ConfigService);
+    constructor(config: ConfigService);
     validate(request: {
         session: {
             accessToken: string;

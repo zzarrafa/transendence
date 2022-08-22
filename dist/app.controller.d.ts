@@ -2,7 +2,7 @@ import { Profile } from 'passport-42';
 import { HttpService } from '@nestjs/axios';
 import { LogDto } from './login/dto';
 import { LoginService } from './login/login.service';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { User } from '@prisma/client';
 import { PrismaService } from "src/prisma/prisma.service";
 export declare class AppController {
@@ -18,8 +18,9 @@ export declare class AppController {
         user: User;
     }>;
     logOut(req: Request): void;
-    login(dto: LogDto, user: Profile, req: Request, rep: Response): Promise<{
+    login(dto: LogDto, user: Profile): Promise<{
         access_token: string;
     }>;
-    hey(userr: Profile): Promise<User>;
+    searrch(): void;
+    search(dto: LogDto): Promise<User>;
 }

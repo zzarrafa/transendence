@@ -16,4 +16,9 @@ model User{
   fullName String
   login String
   picture String
+  twoFactorAuthenticationSecret String;
+  isTwoFactorAuthenticationEnabled Boolean @default(false);
+  
+  ///friends  User[] @relation("friends")
+
 }

@@ -15,14 +15,13 @@ const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 const passport_42_1 = require("passport-42");
 let FtStrategy = class FtStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy, '42') {
-    constructor(configService) {
+    constructor(config) {
         super({
-            clientID: 'f2fb049e379fd41a358e13c7c60a219b5742ca6d0caf2b7ac0875108ccce08b1',
-            clientSecret: '54d6980c1a53ce87beeaf44d6596c9a8eabe16bdf317beb305f539fbeb7c5a37',
+            clientID: config.get('clientID'),
+            clientSecret: config.get('clientSecret'),
             callbackURL: 'http://localhost:3000/login/42/return',
             passReqToCallback: true,
         });
-        this.configService = configService;
     }
     async validate(request, accessToken, refreshToken, profile, cb) {
         request.session.accessToken = accessToken;

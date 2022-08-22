@@ -3,7 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { LogDto } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { Userr } from './user.decorator';
+import { Userr } from './decorators/user.decorator';
 import { Profile } from 'passport-42';
 import { Request, Response } from 'express';
 
@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 export class LoginService {
     constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService ) {}
 
-    async login(logDto: LogDto, @Userr() userr: Profile , req: Request, rep: Response) {
+    async login(logDto: LogDto, @Userr() userr: Profile) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -28,7 +28,7 @@ export class LoginService {
       });
       if (userss)
       {
-        throw new ForbiddenException('name already ');
+        throw new ForbiddenException('name already used');
 
       }
         else {

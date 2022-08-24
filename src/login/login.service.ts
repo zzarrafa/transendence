@@ -39,7 +39,8 @@ export class LoginService {
                     picture: this.isEmpty(logDto.picture) ? userr.photos[0].value: logDto.picture,
                     email: userr.emails[0].value,
                     fullName: userr.displayName,
-                    login: userr.username
+                    login: userr.username,
+                    // twoFactorAuthenticationSecret: null,
                     
                 },
               });

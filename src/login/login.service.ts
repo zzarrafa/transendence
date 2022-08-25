@@ -6,6 +6,7 @@ import { ConfigService } from "@nestjs/config";
 import { Userr } from './decorators/user.decorator';
 import { Profile } from 'passport-42';
 import { Request, Response } from 'express';
+import { User, Prisma } from '@prisma/client';
 
 @Injectable()
 export class LoginService {
@@ -34,35 +35,23 @@ export class LoginService {
         else {
           // console.log("not here!");
             let users = await this.prisma.user.create({
-                data: {
+                  data: {
+                    email: userr.emails[0].value,
                     displayName: logDto.displayName,
                     picture: this.isEmpty(logDto.picture) ? userr.photos[0].value: logDto.picture,
-                    email: userr.emails[0].value,
-                    fullName: userr.displayName,
-                    login: userr.username
-                    
+                    level: 0,
+                    status: 'online',
+                    wins: 0,
+                    loses: 0,
+                    role: 'player',
+                    twoFactorAuthenticationSecret: '',
+                    isTwoFactorAuthenticationEnabled: false
                 },
               });
            
         return this.signToken(users.id,users.displayName);
       }
     }
-async isRegisterd( @Userr() userr: Profile ) 
-{
-    const user =  await this.prisma.user.findUnique({
-      where: {
-          email: userr.emails[0].value,
-      },
-    });
-    if (user)
-    {
-      return true;
-    }
-    else 
-    {
-      return false;
-    }
-}
     
 
     async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
@@ -79,7 +68,7 @@ async isRegisterd( @Userr() userr: Profile )
             secret: secret,
           },
         );
-          
+        
         return {
           access_token: token,
         };
@@ -88,3 +77,5 @@ async isRegisterd( @Userr() userr: Profile )
       isEmpty(str: string) {
         return (!str || str.length === 0 );}
 }
+
+

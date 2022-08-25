@@ -9,16 +9,15 @@ datasource db {
 
 model User{
   id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email String @unique
   displayName String @unique
-  fullName String
-  login String
+  email String @unique
   picture String
-  twoFactorAuthenticationSecret String;
-  isTwoFactorAuthenticationEnabled Boolean @default(false);
-  
-  ///friends  User[] @relation("friends")
+  level Int 
+  status String 
+  wins Int 
+  loses Int 
+  role String 
+  twoFactorAuthenticationSecret String ?
+  isTwoFactorAuthenticationEnabled Boolean ?
 
 }

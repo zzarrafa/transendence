@@ -11,7 +11,6 @@ export declare class LoginService {
     login(logDto: LogDto, userr: Profile): Promise<{
         access_token: string;
     }>;
-    isRegisterd(userr: Profile): Promise<boolean>;
     signToken(userId: number, displayName: string): Promise<{
         access_token: string;
     }>;

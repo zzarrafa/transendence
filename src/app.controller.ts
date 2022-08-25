@@ -20,6 +20,7 @@ import {User} from '@prisma/client';
 import { GetUser } from './login/decorators/get-user.decorator';
 import {PrismaService} from "src/prisma/prisma.service";
 import { ForbiddenException } from '@nestjs/common';
+import { UserService } from './User/user/user.service';
 
 
 @Controller()
@@ -37,6 +38,7 @@ export class AppController {
   logIn() {
     return;
   }
+
 
   @Get('profile')
   @UseGuards(AuthenticatedGuard)
@@ -60,7 +62,7 @@ export class AppController {
   
   @Post('user/register')
   @UseGuards(AuthenticatedGuard)
-  @Redirect('/profile')
+  // @Redirect('/profile')
   login(@Body() dto: LogDto,@Userr() user: Profile) {
       return this.loginService.login(dto,user);}
 

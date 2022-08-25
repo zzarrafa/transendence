@@ -15,6 +15,8 @@ const login_module_1 = require("./login/login.module");
 const login_service_1 = require("./login/login.service");
 const prisma_module_1 = require("./prisma/prisma.module");
 const jwt_1 = require("@nestjs/jwt");
+const user_service_1 = require("./User/user/user.service");
+const user_module_1 = require("./User/user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -23,13 +25,14 @@ AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 envFilePath: '.env'
             }),
+            user_module_1.UserModule,
             login_module_1.LoginModule,
             axios_1.HttpModule,
             prisma_module_1.PrismaModule,
             config_1.ConfigModule.forRoot({ isGlobal: true }),
         ],
         controllers: [app_controller_1.AppController],
-        providers: [login_service_1.LoginService, jwt_1.JwtService],
+        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

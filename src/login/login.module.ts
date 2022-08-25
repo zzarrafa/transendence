@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 
-
+ 
 @Module({
   imports: [JwtModule.register({}),
     ConfigModule.forRoot({isGlobal: true}),

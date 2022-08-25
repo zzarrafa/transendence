@@ -103,7 +103,6 @@ __decorate([
 __decorate([
     (0, common_1.Post)('user/register'),
     (0, common_1.UseGuards)(authenticated_guard_1.AuthenticatedGuard),
-    (0, common_1.Redirect)('/profile'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, user_decorator_1.Userr)()),
     __metadata("design:type", Function),

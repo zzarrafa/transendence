@@ -1,0 +1,19 @@
+User Authentication:
+*Session: cookie-based server-side sessions
+1- User submits login form
+2- Server stores a session in the database
+3- Server responds with a session ID and the browser puts it in cookies
+*Token-Based Auth
+1- User submits login form
+2- Server creares a JWT
+3- Browser puts JWT in local storage
+4- Signed JWT header validated
+
+- Create a PostgreSQL instance (pull image)
+- Set up Prisma (install and init)
+- Model the data
+- Migrate the database
+- Seed the database
+- Create a Prisma service
+
+- Rooms in Socket.IO don't need to be created, one is created when a socket joins it

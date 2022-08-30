@@ -7,29 +7,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
-const axios_1 = require("@nestjs/axios");
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
+const chat_gateway_1 = require("./chat.gateway");
 const app_controller_1 = require("./app.controller");
-const login_module_1 = require("./login/login.module");
-const login_service_1 = require("./login/login.service");
 const prisma_module_1 = require("./prisma/prisma.module");
-const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            config_1.ConfigModule.forRoot({
-                envFilePath: '.env'
-            }),
-            login_module_1.LoginModule,
-            axios_1.HttpModule,
-            prisma_module_1.PrismaModule,
-            config_1.ConfigModule.forRoot({ isGlobal: true }),
-        ],
+        imports: [prisma_module_1.PrismaModule, config_1.ConfigModule.forRoot({ isGlobal: true })],
+        providers: [chat_gateway_1.ChatGateway],
         controllers: [app_controller_1.AppController],
-        providers: [login_service_1.LoginService, jwt_1.JwtService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

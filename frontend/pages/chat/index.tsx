@@ -1,0 +1,3 @@
+function Chat(params:type) {
+    
+}

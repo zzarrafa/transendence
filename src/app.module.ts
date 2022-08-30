@@ -1,22 +1,12 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ChatGateway } from './chat.gateway';
 import { AppController } from './app.controller';
-import { LoginModule } from './login/login.module';
-import { LoginService } from './login/login.service';
-import { PrismaModule } from './prisma/prisma.module';
-import {JwtService} from '@nestjs/jwt';
+import { PrismaModule } from './prisma/prisma.module'
+import { ConfigModule } from '@nestjs/config';
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env'
-    }),
-    LoginModule,
-    HttpModule,
-    PrismaModule,
-    ConfigModule.forRoot({isGlobal: true}),
-  ],
+  imports: [PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
+  providers: [ChatGateway],
   controllers: [AppController],
-  providers: [LoginService, JwtService],
 })
 export class AppModule {}

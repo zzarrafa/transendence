@@ -30,12 +30,10 @@ async getUserById(id: number) {
 }
 
 
-
-
-
-// had l9lawi mzl 
+// had l9lawi bda kaykhdem hhh
 async setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<User>
 {
+  // console.log(userId);
   return await this.prisma.user.update({
     where: {
       id: userId,
@@ -43,6 +41,19 @@ async setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<
     data: {
       twoFactorAuthenticationSecret: secret,
     },
-  })
+  });
+}
+
+async turnOnTwoFactorAuthentication(userId: number): Promise<User>
+{
+  return await this.prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isTwoFactorAuthenticationEnabled: true,
+    },
+  });
 }
 }
+

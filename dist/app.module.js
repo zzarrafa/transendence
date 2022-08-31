@@ -17,6 +17,8 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const jwt_1 = require("@nestjs/jwt");
 const user_service_1 = require("./User/user/user.service");
 const user_module_1 = require("./User/user/user.module");
+const two_fact_service_1 = require("./twofactorAuth/two-fact/two-fact.service");
+const two_fact_module_1 = require("./twofactorAuth/two-fact/two-fact.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -27,12 +29,13 @@ AppModule = __decorate([
             }),
             user_module_1.UserModule,
             login_module_1.LoginModule,
+            two_fact_module_1.TwoFactModule,
             axios_1.HttpModule,
             prisma_module_1.PrismaModule,
             config_1.ConfigModule.forRoot({ isGlobal: true }),
         ],
         controllers: [app_controller_1.AppController],
-        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService],
+        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService, two_fact_service_1.TwoFactService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

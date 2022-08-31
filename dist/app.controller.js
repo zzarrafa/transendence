@@ -51,9 +51,6 @@ let AppController = class AppController {
     login(dto, user) {
         return this.loginService.login(dto, user);
     }
-    searrch() {
-        return;
-    }
     async search(dto) {
         const user = await this.prisma.user.findFirst({
             where: {
@@ -109,14 +106,6 @@ __decorate([
     __metadata("design:paramtypes", [dto_1.LogDto, typeof (_c = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _c : Object]),
     __metadata("design:returntype", void 0)
 ], AppController.prototype, "login", null);
-__decorate([
-    (0, common_1.Get)('search'),
-    (0, common_1.UseGuards)(authenticated_guard_1.AuthenticatedGuard),
-    (0, common_1.Render)('search'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], AppController.prototype, "searrch", null);
 __decorate([
     (0, common_1.Post)('search/user'),
     (0, common_1.UseGuards)(authenticated_guard_1.AuthenticatedGuard),

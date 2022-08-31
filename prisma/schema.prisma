@@ -17,7 +17,7 @@ model User{
   wins Int 
   loses Int 
   role String 
-  twoFactorAuthenticationSecret String ?
-  isTwoFactorAuthenticationEnabled Boolean ?
+  twoFactorAuthenticationSecret String 
+  isTwoFactorAuthenticationEnabled Boolean 
 
 }

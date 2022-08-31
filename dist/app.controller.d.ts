@@ -21,6 +21,5 @@ export declare class AppController {
     login(dto: LogDto, user: Profile): Promise<{
         access_token: string;
     }>;
-    searrch(): void;
     search(dto: LogDto): Promise<User>;
 }

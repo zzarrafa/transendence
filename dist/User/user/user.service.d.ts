@@ -9,6 +9,7 @@ export declare class UserService {
         displayName: string;
         email: string;
     }[]>;
-    verifyToken(token: string): Promise<User>;
+    getUserById(id: number): Promise<User>;
     setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<User>;
+    turnOnTwoFactorAuthentication(userId: number): Promise<User>;
 }

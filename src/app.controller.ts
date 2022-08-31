@@ -66,13 +66,13 @@ export class AppController {
   login(@Body() dto: LogDto,@Userr() user: Profile) {
       return this.loginService.login(dto,user);}
 
-  @Get('search')
-  @UseGuards(AuthenticatedGuard)
-  @Render('search')
-  searrch()
-  {
-    return;
-  }
+  // @Get('search')
+  // @UseGuards(AuthenticatedGuard)
+  // @Render('search')
+  // searrch()
+  // {
+  //   return;
+  // }
 
    @Post('search/user')
    @UseGuards(AuthenticatedGuard)

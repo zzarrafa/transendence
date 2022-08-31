@@ -27,17 +27,16 @@ let UserService = class UserService {
             },
         });
     }
-    async verifyToken(token) {
-        console.log('verify token');
-        try {
-            const decoded = await this.jwtService.verify(token.toString());
-            if (typeof decoded === 'object' && 'id' in decoded)
-                return decoded;
-            throw new common_1.UnauthorizedException();
+    async getUserById(id) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
         }
-        catch (error) {
-            throw new common_1.UnauthorizedException('Token expired');
-        }
+        return user;
     }
     async setTwoFactorAuthenticationSecret(secret, userId) {
         return await this.prisma.user.update({
@@ -46,6 +45,16 @@ let UserService = class UserService {
             },
             data: {
                 twoFactorAuthenticationSecret: secret,
+            },
+        });
+    }
+    async turnOnTwoFactorAuthentication(userId) {
+        return await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                isTwoFactorAuthenticationEnabled: true,
             },
         });
     }

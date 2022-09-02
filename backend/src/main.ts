@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   
-  app.enableCors();
+  app.enableCors({origin: '*'});
 
   // app.use(
   //   session({ resave: false, saveUninitialized: false, secret: 'hey' }),

@@ -9,9 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mui/material": "^5.10.3",
+    "@mui/system": "^5.10.3",
+    "@types/socket.io-client": "^3.0.0",
+    "bootstrap": "^5.2.0",
+    "formik": "^3.0.0-next.8",
     "next": "12.2.5",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "socket.io-client": "^4.5.1"
   },
   "devDependencies": {
     "@types/node": "18.7.14",

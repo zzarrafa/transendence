@@ -5,8 +5,6 @@ import {
   Req,
   UseGuards,
   Body,
-  Get,
-  Render,
 }
   from '@nestjs/common';
 import {UnauthorizedException} from '@nestjs/common';
@@ -15,14 +13,15 @@ import { Response } from 'express';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/login/guards/jwt.guard';
 import { UserService } from 'src/User/user/user.service';
-import { TwoFactorAuthenticationCodeDto } from "src/login/dto";
+import { LoginService } from 'src/login/login.service';
 
 
 
 @Controller('2fa')
 export class TwoFactController {
   constructor(
-    private readonly twoFactorAuthenticationService: TwoFactService, private readonly usersService: UserService
+    private readonly twoFactorAuthenticationService: TwoFactService, private readonly usersService: UserService ,private loginService: LoginService
+  
     
   ) { }
   @UseGuards(JwtGuard)
@@ -31,8 +30,7 @@ export class TwoFactController {
 
     const user = request.user;
     const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(user);
-    //console.log('current user ', user, ' from request ', request);
-
+    
     return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
   }
   @UseGuards(JwtGuard)
@@ -41,14 +39,30 @@ export class TwoFactController {
     @Req() request,
     @Body()  twoFactorAuthenticationCode
   ) {
-    const user = request.user;
-    console.log('===>',twoFactorAuthenticationCode);
-    const isCodeValid =  this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-      twoFactorAuthenticationCode, user);
-    console.log('===> valid ',isCodeValid);
+    const secret = request.user.twoFactorAuthenticationSecret;
+    // console.log('===>',  twoFactorAuthenticationCode['code'], secret);
+    const isCodeValid =  await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+      twoFactorAuthenticationCode['code'], secret);
+    // console.log('===> valid ',isCodeValid);
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication coderr');
+      throw new UnauthorizedException('Wrong authentication code');
     }
-    await this.usersService.turnOnTwoFactorAuthentication(user.id);
+    await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
+
+  @UseGuards(JwtGuard)
+  @Post('authenticate')
+  async authenticate( @Req() request, @Body() twoFactorAuthenticationCode) {
+    const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid( twoFactorAuthenticationCode['code'], request.user.twoFactorAuthenticationSecret);
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    const accessTokenCookie = this.loginService.getCookieWithJwtAccessToken(request.user.id, true);
+ 
+    request.res.setHeader('Set-Cookie', [accessTokenCookie]);
+ 
+    return request.user;
+}
+
 }

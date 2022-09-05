@@ -16,6 +16,7 @@ const config_2 = require("@nestjs/config");
 const jwt_strategy_1 = require("../../login/jwt/jwt.strategy");
 const user_service_1 = require("../../User/user/user.service");
 const user_module_1 = require("../../User/user/user.module");
+const login_service_1 = require("../../login/login.service");
 let TwoFactModule = class TwoFactModule {
 };
 TwoFactModule = __decorate([
@@ -24,7 +25,7 @@ TwoFactModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true }), user_module_1.UserModule
         ],
         controllers: [two_fact_controller_1.TwoFactController],
-        providers: [two_fact_service_1.TwoFactService, jwt_strategy_1.JwtStrategy, config_2.ConfigService, user_service_1.UserService]
+        providers: [two_fact_service_1.TwoFactService, jwt_strategy_1.JwtStrategy, config_2.ConfigService, user_service_1.UserService, login_service_1.LoginService]
     })
 ], TwoFactModule);
 exports.TwoFactModule = TwoFactModule;

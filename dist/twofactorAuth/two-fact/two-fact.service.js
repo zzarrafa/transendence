@@ -32,11 +32,10 @@ let TwoFactService = class TwoFactService {
     async pipeQrCodeStream(stream, otpauthUrl) {
         return (0, qrcode_1.toFileStream)(stream, otpauthUrl);
     }
-    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user) {
-        console.log('===> ', user.twoFactorAuthenticationSecret, ' code ', twoFactorAuthenticationCode.code);
-        return otplib_1.authenticator.verify({
-            token: twoFactorAuthenticationCode.code,
-            secret: user.twoFactorAuthenticationSecret
+    async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, secret) {
+        return await otplib_1.authenticator.verify({
+            token: twoFactorAuthenticationCode,
+            secret: secret
         });
     }
 };

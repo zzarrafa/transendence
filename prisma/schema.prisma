@@ -18,6 +18,18 @@ model User{
   loses Int 
   role String 
   twoFactorAuthenticationSecret String 
-  isTwoFactorAuthenticationEnabled Boolean 
+  isTwoFactorAuthenticationEnabled Boolean
+  gamehistory GameHistory[]
 
+}
+
+model GameHistory {
+  id Int @id @default(autoincrement())
+  mode String
+  winner User @relation(fields : [playerId], references : [id])
+  loser User @relation(fields : [playerId], references : [id])
+  playerID Int
+  winner_score Int
+  loser_score Int
+  createdAt DateTime @default(now())
 }

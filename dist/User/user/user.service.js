@@ -38,6 +38,61 @@ let UserService = class UserService {
         }
         return user;
     }
+    async UpdateDisplayName(id, displayName) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                displayName,
+            },
+        });
+        return user;
+    }
+    async getWins(id) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
+        }
+        return user.wins;
+    }
+    async getLoses(id) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
+        }
+        return user.loses;
+    }
+    async getLevel(id) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
+        }
+        return user.level;
+    }
+    async updateStatus(id, status) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                status,
+            },
+        });
+        return user;
+    }
     async setTwoFactorAuthenticationSecret(secret, userId) {
         return await this.prisma.user.update({
             where: {

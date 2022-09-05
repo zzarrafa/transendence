@@ -30,18 +30,13 @@ export class TwoFactService {
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
     return toFileStream(stream, otpauthUrl);
   }
+// hadchi khedam 
+  public async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, secret: string): Promise<boolean> {
 
-  public isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: TwoFactorAuthenticationCodeDto, user: User) : Boolean {
-    console.log('===> ', user.twoFactorAuthenticationSecret, ' code ', twoFactorAuthenticationCode.code);
-
-    return  authenticator.verify({
-      token: twoFactorAuthenticationCode.code,
-      secret: user.twoFactorAuthenticationSecret
-    });
-
-    // if (!isValid) {
-    //   return new UnauthorizedException('Wrong authentication code');
-
-    // }
+    return await authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret :secret
+  });
+  
   }
 }

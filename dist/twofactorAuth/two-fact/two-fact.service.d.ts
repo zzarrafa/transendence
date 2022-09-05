@@ -2,7 +2,6 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/User/user/user.service';
 import { User } from '@prisma/client';
 import { Response } from 'express';
-import { TwoFactorAuthenticationCodeDto } from "src/login/dto";
 export declare class TwoFactService {
     private readonly usersService;
     private readonly configService;
@@ -12,5 +11,5 @@ export declare class TwoFactService {
         otpauthUrl: string;
     }>;
     pipeQrCodeStream(stream: Response, otpauthUrl: string): Promise<any>;
-    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: TwoFactorAuthenticationCodeDto, user: User): Boolean;
+    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, secret: string): Promise<boolean>;
 }

@@ -18,10 +18,12 @@ const common_2 = require("@nestjs/common");
 const two_fact_service_1 = require("./two-fact.service");
 const jwt_guard_1 = require("../../login/guards/jwt.guard");
 const user_service_1 = require("../../User/user/user.service");
+const login_service_1 = require("../../login/login.service");
 let TwoFactController = class TwoFactController {
-    constructor(twoFactorAuthenticationService, usersService) {
+    constructor(twoFactorAuthenticationService, usersService, loginService) {
         this.twoFactorAuthenticationService = twoFactorAuthenticationService;
         this.usersService = usersService;
+        this.loginService = loginService;
     }
     async register(response, request) {
         const user = request.user;
@@ -29,14 +31,21 @@ let TwoFactController = class TwoFactController {
         return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
     }
     async turnOnTwoFactorAuthentication(request, twoFactorAuthenticationCode) {
-        const user = request.user;
-        console.log('===>', twoFactorAuthenticationCode);
-        const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
-        console.log('===> valid ', isCodeValid);
+        const secret = request.user.twoFactorAuthenticationSecret;
+        const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode['code'], secret);
         if (!isCodeValid) {
-            throw new common_2.UnauthorizedException('Wrong authentication coderr');
+            throw new common_2.UnauthorizedException('Wrong authentication code');
         }
-        await this.usersService.turnOnTwoFactorAuthentication(user.id);
+        await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
+    }
+    async authenticate(request, twoFactorAuthenticationCode) {
+        const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode['code'], request.user.twoFactorAuthenticationSecret);
+        if (!isCodeValid) {
+            throw new common_2.UnauthorizedException('Wrong authentication code');
+        }
+        const accessTokenCookie = this.loginService.getCookieWithJwtAccessToken(request.user.id, true);
+        request.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        return request.user;
     }
 };
 __decorate([
@@ -57,9 +66,18 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "turnOnTwoFactorAuthentication", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('authenticate'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], TwoFactController.prototype, "authenticate", null);
 TwoFactController = __decorate([
     (0, common_1.Controller)('2fa'),
-    __metadata("design:paramtypes", [two_fact_service_1.TwoFactService, user_service_1.UserService])
+    __metadata("design:paramtypes", [two_fact_service_1.TwoFactService, user_service_1.UserService, login_service_1.LoginService])
 ], TwoFactController);
 exports.TwoFactController = TwoFactController;
 //# sourceMappingURL=two-fact.controller.js.map

@@ -5,6 +5,9 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Box } from "@mui/system";
 import React from "react";
 import { io, Socket } from "socket.io-client";
+import { getAllUsers, getUserByUsername } from "../../services/user";
+import { getRoomsForUser, createRoom } from "../../services/room";
+import { IRoom } from "../../commun/types";
 
 type Message = {
   sender: string;
@@ -23,14 +26,7 @@ const MenuProps = {
   },
 };
 
-const names = [
-  "swi3ida",
-  "swimi",
-  "hamza",
-  "mohammed",
-];
 
-const user = "souad";
 const socket = io("http://localhost:8000/chat");
 
 
@@ -38,29 +34,53 @@ function Chat() {
   const [messages, setMessages] = useState<{ [key: string]: Message[] }>({});
   const [status, setStatus] = useState("Join");
   const [showForm, setShowForm] = useState(false);
-  const [room, setRoom] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [room_array, setRoomArray] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [activeRoom, setActiveRoom] = useState("");
   const [rooms, setRooms] = useState<{ [key: string]: boolean}>({});
   const [personName, setPersonName] = React.useState<string[]>([]);
+  const [update, setUpdate] = useState(0);
+  const [user, setUser] = useState("");
+  const [input, setInput] = useState("");
+  const [users, setUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
   useEffect(() => {
+    getAllUsers().then((data) => {
+      setUsers(data);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (personName.length > 0) {
+      let username = personName[personName.length - 1];
+        getUserByUsername(username).then((data) => {
+          setSelectedUsers([...selectedUsers, data.id]);
+        });
+    }
+  }, [personName]);
+
+    
+  useEffect(() => {
     socket.on("chatToClient", (data: Message) => {
+      setUpdate((prev) => prev + 1);
+      console.log('Chattoclient')
       setMessages((messages) => {
         messages[data.room].push(data);
         return messages;
       });
     });
   
+    socket.on('createdRoom', (room: string) => {
+        setUpdate((prev) => prev + 1);
+        setStatus('Leave');
+        setRooms({ ...rooms, [room]: true });
+    });
+
     socket.on('joinedRoom', (room: string) => {
       console.log('joinedRoom');
       setRooms({ ...rooms, [room]: true });
-  
-    });
-  
-    socket.on('createdRoom', (room: string) => {
-        setRooms({ ...rooms, [room]: true });
   
     });
   
@@ -69,6 +89,9 @@ function Chat() {
         setRooms({ ...rooms, [room]: false });
     });
   }, []);
+
+  useEffect(() => {
+  }, [update]);
 
   const handleChange = (event: SelectChangeEvent<typeof personName>) => {
     const { target: { value },} = event;
@@ -79,12 +102,17 @@ function Chat() {
 
   const sendMessage = (e: any) => {
     e.preventDefault();
-    socket.emit("chatToServer", {
+    const data = {
       sender: user,
       room: activeRoom,
       content: message,
       time: new Date(),
-    });
+    };
+    if (isMemberOfActiveRoom()) {
+      socket.emit("chatToServer", data);
+    }
+    else
+      alert('You must join the room before sending messages!');
     setMessage("");
   };
 
@@ -97,27 +125,43 @@ function Chat() {
   }
   const toggleRoomMembership = () => {
     if (isMemberOfActiveRoom()) {
-      socket.emit("leaveRoom", { user, room: activeRoom });
+      socket.emit("leaveRoom", activeRoom);
       setStatus("Join");
     }
     else {
-      socket.emit("joinRoom", { user, room: activeRoom });
+      socket.emit("joinRoom", activeRoom);
       setStatus("Leave");
     }
   };
  
   const createRoom = (e: any) => {
     e.preventDefault();
-    socket.emit("createRoom", room);
-    setRoomArray([...room_array, room]);
-    setRoom("");
+    const data = {
+      room: {
+        name: roomName,
+        users: selectedUsers,
+      },
+      creatorId: 1,
+    };
+
+    socket.emit("createRoom", data);
+    setRoomArray([...room_array, roomName]);
+    setRoomName("");
     setShowForm(false);
-    setMessages({ ...messages, [room]: [] });
+    setMessages({ ...messages, [roomName]: [] });
+    setSelectedUsers([]);
+    setPersonName([]);
   };
 
   const handleClickRoom = (room:string) => {
     setActiveRoom(room);
   };
+
+  const authenticateUser = (e:any) => {
+    e.preventDefault();
+    setUser(input);
+    setInput("")
+  }
 
   return (
     <Box
@@ -125,15 +169,29 @@ function Chat() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        width: "1024px",
       }}
     >
       <h1>Chat</h1>
+      <form
+        onSubmit={(e)=> authenticateUser(e)}
+        style={{display: "flex", gap: "5px", marginBottom: "10px"}}
+        >
+        <Input
+            type='text'
+            placeholder='Enter your name'
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        <Button type='submit' variant='contained' color='primary'>Authenticate</Button>
+      </form>        
       <Box>
         <div style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
           <Button variant="contained" onClick={toggleVisibility}>Create Room</Button>
-          <Button variant="contained" onClick={toggleRoomMembership}> {status} </Button>
+          {
+            activeRoom != "" && (
+            <Button variant="contained" onClick={toggleRoomMembership}> {status} </Button>
+            )
+          }
         </div>
       </Box>
       <form
@@ -143,8 +201,8 @@ function Chat() {
         <Input
           type='text'
           placeholder='Room Name'
-          value={room}
-          onChange={(e) => setRoom(e.target.value)}
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
           style={{ marginBottom: "10px" }}
         />
         <div>
@@ -159,7 +217,7 @@ function Chat() {
               input={<OutlinedInput label='Name' />}
               MenuProps={MenuProps}
             >
-              {names.map((name) => (
+              {users.map((name) => (
                 <MenuItem
                   key={name}
                   value={name}
@@ -211,7 +269,7 @@ function Chat() {
               onChange={(e) => setMessage(e.target.value)}
               style={{ marginRight: "5px" }}
             />
-            <Button type='submit' onClick={sendMessage} variant="contained">
+            <Button type='submit' variant="contained">
               Send
             </Button>
           </form>

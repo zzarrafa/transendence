@@ -7,18 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email String @unique
-  displayName String @unique
-  fullName String
-  login String
-  picture String
-  // twoFactorAuthenticationSecret String 
-  // isTwoFactorAuthenticationEnabled Boolean @default(false)
-  
-  ///friends  User[] @relation("friends")
+// user can join many rooms and a room can have many users
+// many-to-many relationship
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String @unique
+  rooms    Room[] @relation("UserRoom")
+}
 
+model Room {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[] @relation("UserRoom")
 }

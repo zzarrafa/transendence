@@ -7,15 +7,10 @@ import React from "react";
 import { io, Socket } from "socket.io-client";
 import { getAllUsers, getUserByUsername } from "../../services/user";
 import { getRoomsForUser } from "../../services/room";
-import { IRoom, IUser } from "../../commun/types";
+import { IRoom, IUser, IMessage } from "../../commun/types";
 import { useRouter } from 'next/router';
+import { getMessagesForRoom } from "../../services/message";
 
-type Message = {
-  sender: string;
-  room: string;
-  content: string;
-  time: Date;
-};
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -29,12 +24,12 @@ const MenuProps = {
 
 
 function Chat() {
-  const [messages, setMessages] = useState<{ [key: string]: Message[] }>({});
+  const [messages, setMessages] = useState<{ [key: number]: IMessage[] }>({});
   const [status, setStatus] = useState("Join");
   const [showForm, setShowForm] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [message, setMessage] = useState("");
-  const [activeRoom, setActiveRoom] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState<IRoom>();
   const [rooms, setRooms] = useState<{ [key: string]: boolean}>({});
   const [personName, setPersonName] = React.useState<string[]>([]);
   const [update, setUpdate] = useState(0);
@@ -45,6 +40,7 @@ function Chat() {
   const [connectUserId, setConnectUserId] = useState(1);
   const [allRooms, setAllRooms] = useState<IRoom[]>([]);
   const [socket, setSocket] = useState<Socket>();
+  const [showRoomContent, setShowRoomContent] = useState(false);
 
   useEffect(()=> {
     setSocket(io("http://localhost:8000/chat", {
@@ -57,40 +53,38 @@ function Chat() {
   useEffect(()=> {
     if (socket) {
       socket.on("rooms", (rooms: IRoom[]) => {
-        console.log("rooms")
         setUserRooms(rooms);
       });
 
       socket.on("allRooms", (rooms: IRoom[]) => {
-        console.log("all rooms")
         setAllRooms(rooms);
       });
 
-      socket.on("chatToClient", (data: Message) => {
-        setUpdate((prev) => prev + 1);
-        console.log('Chattoclient')
-        setMessages((messages) => {
-          messages[data.room].push(data);
-          return messages;
-        });
+      socket.on("messages", (data) => {
+          setMessages((messages) => {
+            return {
+              ...messages,
+              [data.room]: data.messages,
+            };
+          });
       });
     
-      socket.on('createdRoom', (room: string) => {
-          setUpdate((prev) => prev + 1);
-          setStatus('Leave');
-          setRooms({ ...rooms, [room]: true });
+      socket.on('createdRoom', (room: IRoom) => {
+          // setUpdate((prev) => prev + 1);
+          // setStatus('Leave');
+          // setRooms({ ...rooms, [room.name]: true });
       });
   
-      socket.on('joinedRoom', (room: string) => {
-        console.log('joinedRoom');
-        setRooms({ ...rooms, [room]: true });
+      // socket.on('joinedRoom', (room: string) => {
+      //   console.log('joinedRoom');
+      //   setRooms({ ...rooms, [room]: true });
     
-      });
+      // });
     
-      socket.on('leftRoom', (room: string) => {
-        console.log('leftRoom');
-          setRooms({ ...rooms, [room]: false });
-      });
+      // socket.on('leftRoom', (room: string) => {
+      //   console.log('leftRoom');
+      //     setRooms({ ...rooms, [room]: false });
+      // });
     }
   }, [socket]);
 
@@ -125,40 +119,59 @@ function Chat() {
     );
   };
 
-  const sendMessage = (e: any) => {
+  // const sendMessage = (e: any) => {
+  //   e.preventDefault();
+  //   const data = {
+  //     sender: user!.username,
+  //     room: selectedRoom,
+  //     content: message,
+  //     time: new Date(),
+  //   };
+  //   if (isMemberOfActiveRoom()) {
+  //     socket!.emit("chatToServer", data);
+  //   }
+  //   else
+  //     alert('You must join the room before sending messages!');
+  //   setMessage("");
+  // };
+
+  const createMessage = (e: any) => {
     e.preventDefault();
-    const data = {
-      sender: user!.username,
-      room: activeRoom,
-      content: message,
-      time: new Date(),
-    };
-    if (isMemberOfActiveRoom()) {
-      socket!.emit("chatToServer", data);
+    if (user) {
+      const data = {
+        user: user.id,
+        room: selectedRoom?.id,
+        content: message,
+      }
+      socket!.emit("createMessage", data);
+      setMessage("");
     }
-    else
-      alert('You must join the room before sending messages!');
-    setMessage("");
-  };
+  }
 
   const toggleVisibility = () => {
     setShowForm(!showForm);
   };
 
   const isMemberOfActiveRoom = () => {
-    return rooms[activeRoom];
+    if (selectedRoom) {
+      return rooms[selectedRoom.name]
+    }
   }
   const toggleRoomMembership = () => {
     if (isMemberOfActiveRoom()) {
-      socket!.emit("leaveRoom", activeRoom);
+      socket!.emit("leaveRoom", selectedRoom);
       setStatus("Join");
     }
     else {
-      socket!.emit("joinRoom", activeRoom);
+      socket!.emit("joinRoom", selectedRoom);
       setStatus("Leave");
     }
   };
  
+  useEffect(() => {
+    console.log("Messages:", messages);
+  }, [messages]);
+
   const createRoom = (e: any) => {
     e.preventDefault();
     const data = {
@@ -173,13 +186,18 @@ function Chat() {
     // setRoomArray([...room_array, roomName]);
     setRoomName("");
     setShowForm(false);
-    setMessages({ ...messages, [roomName]: [] });
     setSelectedUsers([]);
     setPersonName([]);
   };
+  useEffect(() => {
+  }, []);
 
-  const handleClickRoom = (room:string) => {
-    setActiveRoom(room);
+  const handleClickRoom = (room: IRoom) => {
+    setSelectedRoom(room);
+    setShowRoomContent(true);
+    getMessagesForRoom(room.id).then((data) => {
+      setMessages({ ...messages, [room.id]: data });
+    });
   };
 
   return (
@@ -200,7 +218,7 @@ function Chat() {
         <div style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
           <Button variant="contained" onClick={toggleVisibility}>Create Room</Button>
           {
-            activeRoom != "" && (
+            selectedRoom && (
             <Button variant="contained" onClick={toggleRoomMembership}> {status} </Button>
             )
           }
@@ -269,10 +287,10 @@ function Chat() {
             userRooms.map((room: IRoom) => {
               return (
                 <Button
-                  variant={activeRoom === room.name ? "contained" : "outlined"}
+                  variant={selectedRoom?.name === room.name ? "contained" : "outlined"}
                   color= "secondary"
                   key={room.name}
-                  onClick={() => handleClickRoom(room.name)}
+                  onClick={() => handleClickRoom(room)}
                 >
                   {room.name}
                 </Button>
@@ -281,21 +299,30 @@ function Chat() {
           }
         </div>
       </Box>
-      <Box>
+      <Box sx={{
+        display: showRoomContent ? "flex" : "none",
+        flexDirection: "column",
+        alignItems: "center",
+        border: "1px solid gray",
+        padding: "10px",
+        margin: "10px",
+        width: "50%",
+        }}>
         <Box>
           <ul id='messages'>
-            {messages[activeRoom] &&
-              messages[activeRoom].map((msg: Message, index) => {
+            
+            {selectedRoom && messages[selectedRoom.id] &&
+              messages[selectedRoom.id].map((msg: IMessage, index) => {
                 return (
                   <li key={index}>
-                    <b>{msg.sender}</b> : {msg.content} <span>{msg.time.toString()}</span>
+                    <b>{msg.user.username}</b> : {msg.content} <span>{msg.createdAt.toString()}</span>
                   </li>
                 );
               })}
           </ul>
         </Box>
         <Box>
-          <form onSubmit={(e) => sendMessage(e)}>
+          <form onSubmit={(e) => createMessage(e)}>
             <Input
               type='text'
               placeholder='Type a message...'
@@ -308,9 +335,9 @@ function Chat() {
             </Button>
           </form>
         </Box>
-        {/* Friends */}
-        <h1>Friends</h1>
       </Box>
+      {/* Friends */}
+      <h1>Friends</h1>
     </Box>
   );
 }

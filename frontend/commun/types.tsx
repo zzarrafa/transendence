@@ -5,12 +5,21 @@ interface IUser {
 }
 
 interface IRoom {
-    id?: number;
+    id: number;
     name: string;
     users: number[];
 }
 
+interface IMessage {
+    id: number;
+    room: number;
+    user: IUser;
+    content: string;
+    createdAt: Date;
+}
+
 export type {
     IUser,
-    IRoom
+    IRoom,
+    IMessage,
 }

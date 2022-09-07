@@ -11,7 +11,7 @@ export class RoomController {
         return this.roomService.createRoom(room, creatorId);
     }
 
-    @Get('/:userId')
+    @Get('user/:userId')
     getRoomsForUser(@Param('userId') userId) {
         return this.roomService.getRoomsForUser(userId);
     }
@@ -19,6 +19,11 @@ export class RoomController {
     @Get('all')
     getAllRooms() {
         return this.roomService.getAllRooms();
+    }
+
+    @Get('/:roomId')
+    getRoomById(@Param('roomId') roomId: number) {
+        return this.roomService.getRoomById(roomId);
     }
 
     // @Post('join')

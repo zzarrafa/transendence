@@ -3,10 +3,11 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { CreateRoomDto } from './room/dto/CreateRoom.dto';
 import { RoomService } from './room/room.service';
+import { MessageService } from './message/message.service';
 
 @WebSocketGateway({ namespace: "/chat", cors: true })
 export class ChatGateway implements OnGatewayInit {
-  constructor(private roomService: RoomService) {}
+  constructor(private roomService: RoomService, private messageService: MessageService) {}
   // connected users
   connections : Socket[] = [];
   // current user
@@ -40,18 +41,47 @@ export class ChatGateway implements OnGatewayInit {
     this.connections = this.connections.filter((c) => c.id !== client.id);
   }
 
-  @SubscribeMessage("chatToServer")
-  handleMessage(
-    client: Socket,
-    payload: { sender: string; room: string; content: string, time: Date }
-  ) {
-    this.server.to(payload.room).emit("chatToClient", payload);
+  // @SubscribeMessage("chatToServer")
+  // handleMessage(
+  //   client: Socket,
+  //   payload: { sender: string; room: string; content: string, time: Date }
+  // ) {
+  //   this.server.to(payload.room).emit("chatToClient", payload);
+  // }
+
+  async isMember(roomID: number, userId: number) {
+    return this.roomService.getRoomById(roomID).then((room) => {
+      return room.users.find((u) => u.id === userId);
+    });
   }
 
+  // createMessage
+  @SubscribeMessage("createMessage")
+  handleCreateMessage(client: Socket, payload: { content: string; room: number; user: number }) {
+    // if user is member of 
+    this.isMember(payload.room, payload.user).then((isMember) => {
+      if(isMember) {
+        this.messageService.createMessage(payload).then(() => {
+          this.messageService.getMessagesForRoom(payload.room).then((messages) => {
+            let userId:number;
+            for(let x of this.connections)
+            {
+                userId = JSON.parse(x.handshake.query.user as string).id;
+                this.isMember(payload.room, userId).then((isMember) => {
+                if(isMember) {
+                  this.server.to(x.id).emit('messages', {messages: messages, room: payload.room});
+                }
+              });
+            }
+        });
+        });
+      }
+    })
+  }
+  
   @SubscribeMessage("joinRoom")
   handleRoomJoin(client: Socket, room: string) {
     this.logger.log("client with id: " + client.id + ", join " + room);
-    client.join(room);
     client.emit("joinedRoom", room);
   }
 
@@ -75,14 +105,13 @@ export class ChatGateway implements OnGatewayInit {
         if(room.users.find((u) => u.id === userId)) {
           this.roomService.getRoomsForUser(userId).then((rooms) => {
             this.server.to(x.id).emit('rooms', rooms);
+            this.server.to(x.id).emit('createdRoom', room);
           });
         }
         this.roomService.getAllRooms().then((rooms) => {
           this.server.to(x.id).emit('allRooms', rooms);
         });
       }
-      this.server.to(client.id).emit('createdRoom', room);
-      client.join(room.name);
   });
   }
 }

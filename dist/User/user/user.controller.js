@@ -23,6 +23,24 @@ let UserController = class UserController {
     async getAllUsers(req) {
         return this.userService.getAllUsers();
     }
+    async getProfile(request) {
+        const user = this.userService.getUserById(request.user.id);
+        const data = {
+            "name": (await user).displayName,
+            "wins": await this.userService.getWins(request.user.id),
+            "loses": await this.userService.getLoses(request.user.id),
+        };
+        return data;
+    }
+    async getProfileById(request, id) {
+        const user = this.userService.getUserById(id);
+        const data = {
+            "name": (await user).displayName,
+            "wins": await this.userService.getWins(id),
+            "loses": await this.userService.getLoses(id),
+        };
+        return data;
+    }
 };
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
@@ -32,6 +50,23 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllUsers", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('profilee'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('/profilee/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getProfileById", null);
 UserController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [user_service_1.UserService])

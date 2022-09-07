@@ -7,4 +7,14 @@ export declare class UserController {
         displayName: string;
         email: string;
     }[]>;
+    getProfile(request: any): Promise<{
+        name: string;
+        wins: number;
+        loses: number;
+    }>;
+    getProfileById(request: any, id: number): Promise<{
+        name: string;
+        wins: number;
+        loses: number;
+    }>;
 }

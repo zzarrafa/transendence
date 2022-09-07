@@ -21,7 +21,7 @@ export class LoginService {
         });
         if (users) {
           // console.log(users.displayName);
-            return this.getCookieWithJwtAccessToken(users.id);
+            return this.signToken(users.id, users.displayName);
         }
         const userss = await this.prisma.user.findUnique({
           where: {
@@ -50,30 +50,30 @@ export class LoginService {
                 },
               });
            
-        return this.getCookieWithJwtAccessToken(users.id);
+        return this.signToken(users.id, users.displayName);
       }
     }
     
 
-    // async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
-    //     const payload = {
-    //       sub: userId,
-    //       displayName,
-    //     };
-    //     const secret = this.config.get('JWT_SECRET');
+    async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
+        const payload = {
+          sub: userId,
+          displayName,
+        };
+        const secret = this.config.get('JWT_SECRET');
     
-    //     const token = await this.jwt.signAsync(
-    //       payload,
-    //       {
-    //         expiresIn: '30m',
-    //         secret: secret,
-    //       },
-    //     );
+        const token = await this.jwt.signAsync(
+          payload,
+          {
+            expiresIn: '30m',
+            secret: secret,
+          },
+        );
         
-    //     return {
-    //       access_token: token,
-    //     };
-    //   }
+        return {
+          access_token: token,
+        };
+      }
 
       isEmpty(str: string) {
         return (!str || str.length === 0 );}

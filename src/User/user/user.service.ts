@@ -85,6 +85,7 @@ async updateStatus(id: number, status: UserStatus) {
     });
     return user;
 }
+
 // update win and loses
 
 

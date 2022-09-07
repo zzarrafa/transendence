@@ -26,6 +26,15 @@ model User{
 
 }
 
+// model Relationship{
+//   id Int @id @default(autoincrement())
+//   receiver Int
+//   sender User @relation("friends", fields: [senderId], references: [id])
+//   senderId Int
+//   status String
+// }
+
+
 model GameHistory {
   id Int @id @default(autoincrement())
   mode String

@@ -18,10 +18,3 @@ User Authentication:
 
 - Rooms in Socket.IO don't need to be created, one is created when a socket joins it
 
-TODO:
-- Register a new User
-- Login with a user and get a valid jwt Token for Auth (API & Websocket)
-- Create a Chatroom and add other users by their username
-- Join one of your chatrooms and see the latest messages
-- Add a message to the chatroom, this will be emmitted immediately to all 
-other joined Users for this Room that are currently online

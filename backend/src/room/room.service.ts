@@ -14,6 +14,9 @@ export class RoomService {
                     connect: room.users.map((id) => ({ id })),
                 }
             },
+            include: {
+                users: true,
+            }
         });
     }
 

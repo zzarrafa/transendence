@@ -1,0 +1,13 @@
+TODO:
+- Create a Chatroom and add other users by their username : DONE
+- Inform all users, that are users of the room, when a new room is created: DONE
+- send all rooms to connected users: DONE
+
+
+- Join one of your chatrooms and see the latest messages
+- Add a message to the chatroom, this will be emmitted immediately to all 
+other joined Users for this Room that are currently online
+
+
+- All Rooms (public + user rooms + protected rooms)
+- User Room (private)

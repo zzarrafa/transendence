@@ -7,6 +7,10 @@ import { RoomService } from './room/room.service';
 @WebSocketGateway({ namespace: "/chat", cors: true })
 export class ChatGateway implements OnGatewayInit {
   constructor(private roomService: RoomService) {}
+  // connected users
+  connections : Socket[] = [];
+  // current user
+  currentUser: any; // IUser
 
   @WebSocketServer() server: Server;
 
@@ -14,6 +18,26 @@ export class ChatGateway implements OnGatewayInit {
 
   afterInit(server: any) {
     this.logger.log("Initialized!");
+  }
+  // TODO: current user id then set socket.data.user = user
+  // (take it from socket.handshake.query.token)
+
+  handleConnection(client: Socket) {
+    this.currentUser = JSON.parse(client.handshake.query.user as string);
+    this.logger.log(`Client connected: ${client.id}`);
+    this.connections.push(client);
+    this.roomService.getRoomsForUser(this.currentUser.id).then((rooms) => {
+      this.server.to(client.id).emit('rooms', rooms);
+    });
+    this.roomService.getAllRooms().then((rooms) => {
+      this.server.to(client.id).emit('allRooms', rooms);
+    }
+    );
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`Client disconnected: ${client.id}`);
+    this.connections = this.connections.filter((c) => c.id !== client.id);
   }
 
   @SubscribeMessage("chatToServer")
@@ -41,14 +65,24 @@ export class ChatGateway implements OnGatewayInit {
   // create a new room
   @SubscribeMessage("createRoom")
   handleRoomCreate(client: Socket, payload: { room: CreateRoomDto; creatorId: number }) {
-    this.logger.log("client with id: " + client.id + ", create " + payload.room.name);
+    let userId: number;
+    
     this.roomService.createRoom(payload.room, payload.creatorId).then((room) => {
-      console.log("room created: ", room);
-      client.emit("createdRoom", room.name);
-    });
-    client.join(payload.room.name);
+      this.logger.log("client with id: " + client.id + ", create " + room.name);
+      for(let x of this.connections)
+      {
+        userId = JSON.parse(x.handshake.query.user as string).id;
+        if(room.users.find((u) => u.id === userId)) {
+          this.roomService.getRoomsForUser(userId).then((rooms) => {
+            this.server.to(x.id).emit('rooms', rooms);
+          });
+        }
+        this.roomService.getAllRooms().then((rooms) => {
+          this.server.to(x.id).emit('allRooms', rooms);
+        });
+      }
+      this.server.to(client.id).emit('createdRoom', room);
+      client.join(room.name);
+  });
   }
 }
-
-
-// emit rooms (getRoomsForUser)

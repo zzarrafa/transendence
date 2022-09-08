@@ -36,4 +36,8 @@ export class MessageService {
             },
         });
     }
+
+    async deleteAllMessages() {
+        return this.prisma.message.deleteMany({});
+    }
 }

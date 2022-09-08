@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/CreateRoom.dto';
 
@@ -26,6 +26,20 @@ export class RoomController {
         return this.roomService.getRoomById(roomId);
     }
 
+    @Post('join')
+    joinRoom(@Body('roomId') roomId: number, @Body('userId') userId: number) {
+        return this.roomService.joinRoom(roomId, userId);
+    }
+    
+    @Post('leave')
+    leaveRoom(@Body('roomId') roomId: number, @Body('userId') userId: number) {
+        return this.roomService.leaveRoom(roomId, userId);
+    }
+
+    @Delete('/delete')
+    deleteAllRooms() {
+        return this.roomService.deleteAllRooms();
+    }
     // @Post('join')
     // joinRoom(@Body('roomId') roomId: any, @Body('userId') userId: any) {
     //     return this.roomService.joinRoom(roomId, userId);

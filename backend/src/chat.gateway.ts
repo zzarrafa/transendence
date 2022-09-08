@@ -31,6 +31,7 @@ export class ChatGateway implements OnGatewayInit {
       this.server.to(client.id).emit('rooms', rooms);
     });
     this.roomService.getAllRooms().then((rooms) => {
+      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
       this.server.to(client.id).emit('allRooms', rooms);
     }
     );
@@ -40,14 +41,6 @@ export class ChatGateway implements OnGatewayInit {
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connections = this.connections.filter((c) => c.id !== client.id);
   }
-
-  // @SubscribeMessage("chatToServer")
-  // handleMessage(
-  //   client: Socket,
-  //   payload: { sender: string; room: string; content: string, time: Date }
-  // ) {
-  //   this.server.to(payload.room).emit("chatToClient", payload);
-  // }
 
   async isMember(roomID: number, userId: number) {
     return this.roomService.getRoomById(roomID).then((room) => {
@@ -80,16 +73,32 @@ export class ChatGateway implements OnGatewayInit {
   }
   
   @SubscribeMessage("joinRoom")
-  handleRoomJoin(client: Socket, room: string) {
-    this.logger.log("client with id: " + client.id + ", join " + room);
-    client.emit("joinedRoom", room);
+  handleRoomJoin(client: Socket, roomId: number) {
+    this.roomService.joinRoom(roomId, this.currentUser.id).then(() => {
+      this.roomService.getRoomsForUser(this.currentUser.id).then((rooms) => {
+        this.server.to(client.id).emit('rooms', rooms);
+      });
+      this.roomService.getAllRooms().then((rooms) => {
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
+        this.server.to(client.id).emit('allRooms', rooms);
+      }
+      );
+    });
   }
 
+
   @SubscribeMessage("leaveRoom")
-  handleRoomLeave(client: Socket, room: string) {
-    this.logger.log("client with id: " + client.id + ", leave " + room);
-    client.leave(room);
-    client.emit("leftRoom", room);
+  handleRoomLeave(client: Socket, roomId: number) {
+    this.roomService.leaveRoom(roomId, this.currentUser.id).then(() => {
+      this.roomService.getRoomsForUser(this.currentUser.id).then((rooms) => {
+        this.server.to(client.id).emit('rooms', rooms);
+      });
+      this.roomService.getAllRooms().then((rooms) => {
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
+        this.server.to(client.id).emit('allRooms', rooms);
+      }
+      );
+    });
   }
 
   // create a new room
@@ -109,6 +118,8 @@ export class ChatGateway implements OnGatewayInit {
           });
         }
         this.roomService.getAllRooms().then((rooms) => {
+          // substract rooms that user is already in
+          rooms = rooms.filter((r) => !r.users.find((u) => u.id === userId));
           this.server.to(x.id).emit('allRooms', rooms);
         });
       }

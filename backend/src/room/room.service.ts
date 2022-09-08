@@ -29,9 +29,13 @@ export class RoomService {
     }
     
     async getAllRooms() {
-        return this.prisma.room.findMany();
+        return this.prisma.room.findMany({
+            include: {
+                users: true,
+            }
+        })
     }
-
+    
     async getRoomById(roomId: any) {
         return this.prisma.room.findUnique({
             where: {
@@ -41,6 +45,40 @@ export class RoomService {
                 users: true,
             }
         });
+    }
+
+    async joinRoom(roomId: number, userId: number) {
+        return this.prisma.room.update({
+            where: {
+                id: roomId,
+            },
+            data: {
+                users: {
+                    connect: {
+                        id: userId,
+                    },
+                },
+            },
+        });
+    }
+
+    async leaveRoom(roomId: number, userId: number) {
+        return this.prisma.room.update({
+            where: {
+                id: roomId,
+            },
+            data: {
+                users: {
+                    disconnect: {
+                        id: userId,
+                    },
+                },
+            },
+        });
+    }
+
+    async deleteAllRooms() {
+        return this.prisma.room.deleteMany({});
     }
 
     // async joinRoom(roomId: any, userId: any) {

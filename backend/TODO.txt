@@ -5,7 +5,8 @@ TODO:
 - Add Message to chatroom: DONE
 - Load all Messages of a Room: DONE
 
-- Join && leave chatroom
+- Join && leave a public chatroom: DONE
+- DM message
 
 
 - All Rooms (public + user rooms + protected rooms)

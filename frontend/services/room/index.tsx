@@ -20,8 +20,15 @@ async function createRoom(room: IRoom, creatorId: number) {
     return data;
 }
 
+async function getRoomById(roomId: number) {
+    const response = await fetch(`${apiUrl}room/${roomId}`);
+    const data = await response.json();
+    return data;
+}
+
 
 export {
     getRoomsForUser,
-    createRoom
+    createRoom,
+    getRoomById
 }

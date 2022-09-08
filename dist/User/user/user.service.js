@@ -93,6 +93,17 @@ let UserService = class UserService {
         });
         return user;
     }
+    async updaatepicture(id, picture) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                picture,
+            },
+        });
+        return user;
+    }
     async setTwoFactorAuthenticationSecret(secret, userId) {
         return await this.prisma.user.update({
             where: {

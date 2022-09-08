@@ -1,8 +1,9 @@
-import { Controller, Get , Req , UseGuards, Param, ParseIntPipe} from '@nestjs/common';
+import { Controller, Get , Req , UseGuards, Param, ParseIntPipe, Post, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/login/guards/jwt.guard';
 import { Request, Response } from 'express'
-import { request } from 'http';
+import fs from 'fs';
 
 @Controller()
 export class UserController {
@@ -38,4 +39,13 @@ export class UserController {
         }
         return data;
     }
+    // mzl matestithach
+    @UseGuards(JwtGuard)
+    @Post('profilee/picture/:imageName')
+    @UseInterceptors(FileInterceptor('picture'))
+    async updateProfilePic(@Req() request, @Param('imageName') imageName : string, @UploadedFile() picture: Express.Multer.File,  ) {
+        fs.writeFileSync(process.cwd() + "/public/" + imageName, picture.buffer)
+        return this.userService.updaatepicture(request.user.id, imageName);
+    }
+
 }

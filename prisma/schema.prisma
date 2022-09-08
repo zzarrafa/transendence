@@ -23,16 +23,17 @@ model User{
   lostHistory GameHistory[] @relation("loser")
   friends User[] @relation("friends")
   friendOf User[] @relation("friends")
+  relationRequests Relationship[] @relation("relationRequests")
 
 }
 
-// model Relationship{
-//   id Int @id @default(autoincrement())
-//   receiver Int
-//   sender User @relation("friends", fields: [senderId], references: [id])
-//   senderId Int
-//   status String
-// }
+model Relationship{
+  id Int @id @default(autoincrement())
+  receiver Int
+  sender User @relation("relationRequests", fields: [senderId], references: [id])
+  senderId Int
+  status String
+}
 
 
 model GameHistory {
@@ -43,6 +44,6 @@ model GameHistory {
   winnerId Int
   loserId Int
   winner_score Int
-  loser_score Int
+  loser_score Int 
   createdAt DateTime @default(now())
 }

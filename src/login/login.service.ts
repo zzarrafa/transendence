@@ -21,7 +21,11 @@ export class LoginService {
         });
         if (users) {
           // console.log(users.displayName);
-            return this.signToken(users.id, users.displayName);
+            // const tok1= this.signToken(users.id, users.displayName);
+            return this.getCookieWithJwtAccessToken(users.id);
+
+           
+            // request.res.setHeader('Set-Cookie', [TokenCookie])
         }
         const userss = await this.prisma.user.findUnique({
           where: {
@@ -50,42 +54,47 @@ export class LoginService {
                 },
               });
            
-        return this.signToken(users.id, users.displayName);
+              return this.getCookieWithJwtAccessToken(users.id);
+         // request.res.setHeader('Set-Cookie', [TokenCookie])
       }
     }
     
 
-    async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
-        const payload = {
-          sub: userId,
-          displayName,
-        };
-        const secret = this.config.get('JWT_SECRET');
+    // async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
+    //     const payload = {
+    //       sub: userId,
+    //       displayName,
+    //     };
+    //     const secret = this.config.get('JWT_SECRET');
     
-        const token = await this.jwt.signAsync(
-          payload,
-          {
-            expiresIn: '30m',
-            secret: secret,
-          },
-        );
+    //     const token = await this.jwt.signAsync(
+    //       payload,
+    //       {
+    //         expiresIn: '30m',
+    //         secret: secret,
+    //       },
+    //     );
         
-        return {
-          access_token: token,
-        };
-      }
+    //     return {
+    //       access_token: token,
+    //     };
+    //   }
 
       isEmpty(str: string) {
         return (!str || str.length === 0 );}
 
 
         public getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
-          const payload : TokenPayload = { userId, isSecondFactorAuthenticated };
-          const token = this.jwt.sign(payload, {
-            secret: this.config.get('JWT_ACCESS_TOKEN_SECRET'),
+          const payload : TokenPayload = { 
+            sub : userId, 
+            isSecondFactorAuthenticated };
+          const token = this.jwt.signAsync(payload, {
+            secret: this.config.get('JWT_SECRET'),
             expiresIn: '30m',
           });
-          return `Authentication=${token}`;
+          return{
+          access_token: token,
+          };
         }
 }
 

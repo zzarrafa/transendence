@@ -19,7 +19,7 @@ export declare class AppController {
     }>;
     logOut(req: Request): void;
     login(dto: LogDto, user: Profile): Promise<{
-        access_token: string;
+        access_token: Promise<string>;
     }>;
     search(dto: LogDto): Promise<User>;
 }

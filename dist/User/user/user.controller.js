@@ -14,8 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const user_service_1 = require("./user.service");
 const jwt_guard_1 = require("../../login/guards/jwt.guard");
+const fs_1 = require("fs");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -40,6 +42,10 @@ let UserController = class UserController {
             "loses": await this.userService.getLoses(id),
         };
         return data;
+    }
+    async updateProfilePic(request, imageName, picture) {
+        fs_1.default.writeFileSync(process.cwd() + "/public/" + imageName, picture.buffer);
+        return this.userService.updaatepicture(request.user.id, imageName);
     }
 };
 __decorate([
@@ -67,6 +73,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getProfileById", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('profilee/picture/:imageName'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('picture')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('imageName')),
+    __param(2, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateProfilePic", null);
 UserController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [user_service_1.UserService])

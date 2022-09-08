@@ -34,7 +34,7 @@ let LoginService = class LoginService {
             },
         });
         if (users) {
-            return this.signToken(users.id, users.displayName);
+            return this.getCookieWithJwtAccessToken(users.id);
         }
         const userss = await this.prisma.user.findUnique({
             where: {
@@ -59,33 +59,24 @@ let LoginService = class LoginService {
                     isTwoFactorAuthenticationEnabled: false
                 },
             });
-            return this.signToken(users.id, users.displayName);
+            return this.getCookieWithJwtAccessToken(users.id);
         }
-    }
-    async signToken(userId, displayName) {
-        const payload = {
-            sub: userId,
-            displayName,
-        };
-        const secret = this.config.get('JWT_SECRET');
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '30m',
-            secret: secret,
-        });
-        return {
-            access_token: token,
-        };
     }
     isEmpty(str) {
         return (!str || str.length === 0);
     }
     getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
-        const payload = { userId, isSecondFactorAuthenticated };
-        const token = this.jwt.sign(payload, {
-            secret: this.config.get('JWT_ACCESS_TOKEN_SECRET'),
+        const payload = {
+            sub: userId,
+            isSecondFactorAuthenticated
+        };
+        const token = this.jwt.signAsync(payload, {
+            secret: this.config.get('JWT_SECRET'),
             expiresIn: '30m',
         });
-        return `Authentication=${token}`;
+        return {
+            access_token: token,
+        };
     }
 };
 __decorate([

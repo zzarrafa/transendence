@@ -28,7 +28,7 @@ let JwtTwoFactorStrategy = class JwtTwoFactorStrategy extends (0, passport_1.Pas
         this.userService = userService;
     }
     async validate(payload) {
-        const user = await this.userService.getUserById(payload.userId);
+        const user = await this.userService.getUserById(payload.sub);
         if (!user.isTwoFactorAuthenticationEnabled) {
             return user;
         }

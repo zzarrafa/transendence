@@ -6,7 +6,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
     constructor(config: ConfigService, prisma: PrismaService);
     validate(payload: {
         sub: number;
-        displayName: string;
+        isSecondFactorAuthenticated: boolean;
     }): Promise<import(".prisma/client").User>;
 }
 export {};

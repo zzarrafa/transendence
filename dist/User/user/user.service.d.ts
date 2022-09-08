@@ -16,6 +16,7 @@ export declare class UserService {
     getLoses(id: number): Promise<number>;
     getLevel(id: number): Promise<number>;
     updateStatus(id: number, status: UserStatus): Promise<User>;
+    updaatepicture(id: number, picture: string): Promise<User>;
     setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<User>;
     turnOnTwoFactorAuthentication(userId: number): Promise<User>;
 }

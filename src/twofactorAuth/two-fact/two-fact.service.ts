@@ -37,6 +37,6 @@ export class TwoFactService {
       token: twoFactorAuthenticationCode,
       secret :secret
   });
-  
+
   }
 }

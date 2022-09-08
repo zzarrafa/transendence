@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { UserService } from './user.service';
 import { Request } from 'express';
 export declare class UserController {
@@ -17,4 +18,5 @@ export declare class UserController {
         wins: number;
         loses: number;
     }>;
+    updateProfilePic(request: any, imageName: string, picture: Express.Multer.File): Promise<import(".prisma/client").User>;
 }

@@ -19,6 +19,8 @@ const user_service_1 = require("./User/user/user.service");
 const user_module_1 = require("./User/user/user.module");
 const two_fact_service_1 = require("./twofactorAuth/two-fact/two-fact.service");
 const two_fact_module_1 = require("./twofactorAuth/two-fact/two-fact.module");
+const request_module_1 = require("./Relationship/request/request.module");
+const request_service_1 = require("./Relationship/request/request.service");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -33,9 +35,10 @@ AppModule = __decorate([
             axios_1.HttpModule,
             prisma_module_1.PrismaModule,
             config_1.ConfigModule.forRoot({ isGlobal: true }),
+            request_module_1.RequestModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService, two_fact_service_1.TwoFactService],
+        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService, two_fact_service_1.TwoFactService, request_service_1.RequestService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

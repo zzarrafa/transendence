@@ -9,7 +9,9 @@ import {JwtService} from '@nestjs/jwt';
 import { UserService } from './User/user/user.service';
 import { UserModule } from './User/user/user.module';
 import { TwoFactService } from './twofactorAuth/two-fact/two-fact.service';
-import { TwoFactModule } from './twofactorAuth/two-fact/two-fact.module'
+import { TwoFactModule } from './twofactorAuth/two-fact/two-fact.module';
+import { RequestModule } from './Relationship/request/request.module';
+import { RequestService } from './Relationship/request/request.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,8 +23,9 @@ import { TwoFactModule } from './twofactorAuth/two-fact/two-fact.module'
     HttpModule,
     PrismaModule,
     ConfigModule.forRoot({isGlobal: true}),
+    RequestModule,
   ],
   controllers: [AppController],
-  providers: [LoginService, JwtService, UserService, TwoFactService],
+  providers: [LoginService, JwtService, UserService, TwoFactService, RequestService],
 })
 export class AppModule {}

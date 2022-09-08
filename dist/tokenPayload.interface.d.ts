@@ -1,4 +1,4 @@
 export default interface TokenPayload {
-    userId: number;
+    sub: number;
     isSecondFactorAuthenticated: boolean;
 }

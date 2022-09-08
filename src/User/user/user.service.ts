@@ -86,6 +86,18 @@ async updateStatus(id: number, status: UserStatus) {
     return user;
 }
 
+async updaatepicture(id: number, picture: string) {
+    const user = await this.prisma.user.update({
+        where: {
+            id,
+        },
+        data: {
+            picture,
+        },
+    });
+    return user;
+}
+
 // update win and loses
 
 

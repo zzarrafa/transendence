@@ -39,15 +39,25 @@ let UserService = class UserService {
         return user;
     }
     async UpdateDisplayName(id, displayName) {
-        const user = await this.prisma.user.update({
+        const user = await this.prisma.user.findUnique({
             where: {
-                id,
-            },
-            data: {
-                displayName,
+                displayName: displayName,
             },
         });
-        return user;
+        if (user) {
+            throw new common_1.NotFoundException('display name already used');
+        }
+        else {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: id,
+                },
+                data: {
+                    displayName: displayName,
+                },
+            });
+            return user;
+        }
     }
     async getWins(id) {
         const user = await this.prisma.user.findUnique({

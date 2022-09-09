@@ -47,6 +47,9 @@ let UserController = class UserController {
         fs_1.default.writeFileSync(process.cwd() + "/public/" + imageName, picture.buffer);
         return this.userService.updaatepicture(request.user.id, imageName);
     }
+    async updateDisplayName(request, displayName) {
+        return this.userService.UpdateDisplayName(request.user.id, displayName['displayName']);
+    }
 };
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
@@ -84,6 +87,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateProfilePic", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('profilee/displayName'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateDisplayName", null);
 UserController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [user_service_1.UserService])

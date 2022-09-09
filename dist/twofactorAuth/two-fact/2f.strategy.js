@@ -22,7 +22,7 @@ let JwtTwoFactorStrategy = class JwtTwoFactorStrategy extends (0, passport_1.Pas
                     var _a;
                     return (_a = request === null || request === void 0 ? void 0 : request.cookies) === null || _a === void 0 ? void 0 : _a.Authentication;
                 }]),
-            secretOrKey: configService.get('JWT_ACCESS_TOKEN_SECRET')
+            secretOrKey: configService.get('JWT_SECRET')
         });
         this.configService = configService;
         this.userService = userService;

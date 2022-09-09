@@ -30,16 +30,27 @@ async getUserById(id: number) {
     return user;
 }
 async UpdateDisplayName(id: number, displayName: string) {
+
+    const user = await this.prisma.user.findUnique({
+        where: {
+            displayName : displayName,
+        },
+    });
+    if (user) {
+        //ma3rftch achmen exception ndir
+        throw new NotFoundException('display name already used');
+    }
+    else{
     const user = await this.prisma.user.update({
         where: {
-            id,
+            id : id,
         },
         data: {
-            displayName,
+            displayName : displayName,
         },
     });
     return user;
-}
+}}
 async getWins(id: number) {
     const user = await this.prisma.user.findUnique({
         where: {

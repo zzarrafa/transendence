@@ -19,4 +19,5 @@ export declare class UserController {
         loses: number;
     }>;
     updateProfilePic(request: any, imageName: string, picture: Express.Multer.File): Promise<import(".prisma/client").User>;
+    updateDisplayName(request: any, displayName: any): Promise<import(".prisma/client").User>;
 }

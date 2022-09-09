@@ -36,19 +36,11 @@ let LoginService = class LoginService {
         if (users) {
             return this.getCookieWithJwtAccessToken(users.id);
         }
-        const userss = await this.prisma.user.findUnique({
-            where: {
-                displayName: logDto.displayName,
-            },
-        });
-        if (userss) {
-            throw new common_1.ForbiddenException('name already used');
-        }
         else {
             let users = await this.prisma.user.create({
                 data: {
                     email: userr.emails[0].value,
-                    displayName: logDto.displayName,
+                    displayName: '',
                     picture: this.isEmpty(logDto.picture) ? userr.photos[0].value : logDto.picture,
                     level: 0,
                     status: 'online',
@@ -74,9 +66,7 @@ let LoginService = class LoginService {
             secret: this.config.get('JWT_SECRET'),
             expiresIn: '30m',
         });
-        return {
-            access_token: token,
-        };
+        return token;
     }
 };
 __decorate([

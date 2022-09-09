@@ -1,21 +1,21 @@
 <%- include('./header.ejs') %> <% if (!user) { %>
-<p>Welcome! Please <a href="/login">log in.</a></p>
+<p>Welcome! Please <a href="/login/42">log in.</a></p>
 <% } else { %>
-<p>Hello, <%= user.displayName %>. register your displayName .</p>
-<form id="register" method="post" action="/user/register">    
-    <label><b>displayName   
+<p>Hello, <%= user.displayName %> .</p>
+<form id="register" >    
+    <!-- <label><b>displayName   
     </b>    
-    </label>    
-    <input type="text" name="displayName" id="displayName" placeholder="displayName">    
+    </label>     -->
+    <!-- <input type="text" name="displayName" id="displayName" placeholder="displayName">    
     <br><br>    
     <label><b>choose file
     </b>
     <br>
     </label>
     <input type="file" id="picture" name="picture">    
-    <br>
-    <br>
-    <input type="submit" name="button" id="submit" value="Register">
+    <br> -->
+    <!-- <br> -->
+    <!-- <input type="submit" name="button" id="submit" value="Register"> -->
 </form>
 <!-- <p><a href="/data">data</a>.</p> -->
 <% } %> <%- include('./footer.ejs') %>

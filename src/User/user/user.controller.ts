@@ -1,4 +1,4 @@
-import { Controller, Get , Req , UseGuards, Param, ParseIntPipe, Post, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { Controller, Get , Req , UseGuards, Param, ParseIntPipe, Post, UseInterceptors, UploadedFile, Body} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/login/guards/jwt.guard';
@@ -47,5 +47,12 @@ export class UserController {
         fs.writeFileSync(process.cwd() + "/public/" + imageName, picture.buffer)
         return this.userService.updaatepicture(request.user.id, imageName);
     }
+
+    @UseGuards(JwtGuard)
+    @Post('profilee/displayName')
+    async updateDisplayName(@Req() request, @Body()  displayName) {
+        return this.userService.UpdateDisplayName(request.user.id, displayName['displayName']);
+    }
+
 
 }

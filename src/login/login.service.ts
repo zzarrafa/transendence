@@ -27,22 +27,22 @@ export class LoginService {
            
             // request.res.setHeader('Set-Cookie', [TokenCookie])
         }
-        const userss = await this.prisma.user.findUnique({
-          where: {
-              displayName: logDto.displayName,
-          },
-      });
-      if (userss)
-      {
-        throw new ForbiddenException('name already used');
+      //   const userss = await this.prisma.user.findUnique({
+      //     where: {
+      //         displayName: logDto.displayName,
+      //     },
+      // });
+      // if (userss)
+      // {
+      //   throw new ForbiddenException('name already used');
 
-      }
+      // }
         else {
           // console.log("not here!");
             let users = await this.prisma.user.create({
                   data: {
                     email: userr.emails[0].value,
-                    displayName: logDto.displayName,
+                    displayName: '',
                     picture: this.isEmpty(logDto.picture) ? userr.photos[0].value: logDto.picture,
                     level: 0,
                     status: 'online',
@@ -92,9 +92,7 @@ export class LoginService {
             secret: this.config.get('JWT_SECRET'),
             expiresIn: '30m',
           });
-          return{
-          access_token: token,
-          };
+         return token;
         }
 }
 

@@ -6,11 +6,10 @@ import { Box } from "@mui/system";
 import React from "react";
 import { io, Socket } from "socket.io-client";
 import { getAllUsers, getUserByUsername } from "../../services/user";
-import { getRoomById } from "../../services/room";
 import { IRoom, IUser, IMessage } from "../../commun/types";
-import { useRouter } from 'next/router';
 import { getMessagesForRoom } from "../../services/message";
 import moment from "moment";
+import Search from "../../commun/search";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -136,6 +135,7 @@ function Chat() {
       room: {
         name: roomName,
         users: selectedUsers,
+        type: "GROUP"
       },
       creatorId: connectUserId,
     };
@@ -179,6 +179,7 @@ function Chat() {
             Welcome {user.username}
            </h4>
       )}
+      <Search></Search>
       <Box sx={{marginTop: "5px"}}>
         <div style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
           <Button variant="contained" onClick={toggleVisibility}>Create Room</Button>
@@ -242,7 +243,7 @@ function Chat() {
         </div>
         <Button type="submit" variant="contained">Create</Button>
       </form>
-      <h1>User Rooms</h1>
+      <h1>User Rooms (Group)</h1>
       <Box>
         <div id='rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
           {
@@ -305,8 +306,8 @@ function Chat() {
           </Box>
         </Box>
       }
-      {/* Friends */}
-      <h1>Friends</h1>
+      <h1>DM Rooms</h1>
+      
     </Box>
   );
 }

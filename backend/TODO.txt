@@ -4,11 +4,17 @@ TODO:
 - send all rooms to connected users: DONE
 - Add Message to chatroom: DONE
 - Load all Messages of a Room: DONE
-
-- Join && leave a public chatroom: DONE
-- DM message
+- Join && leave a Public chatroom: DONE
 
 
-- All Rooms (public + user rooms + protected rooms)
-- User Room (private)
-- User (banned, blocked, muted)
+
+- DM message (search user and send him msg (not a blocked user))
+- Private Room
+- protected Room by password
+- block user (he can see new messages)
+- add role to user (channel owner->administartor: add password to channel, modify it or remove it, set user to administartor;
+                    administrator: ban or mute user for a limited time
+                    )
+- admin: 2, owner: 1, member: 0, 
+- ban : nkhrjo mn group o my3wd ydir join hta yssali lwa9t
+- mute: he can't send msg UNTIL end time

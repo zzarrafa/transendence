@@ -42,6 +42,11 @@ export class UserController {
         return this.userService.getUserByUsername(username);
     }
 
+    @Get('id/:id')
+    getUserById(@Param('id') id) {
+        return this.userService.getUserById(id);
+    }
+
     @Delete('delete')
     deleteAllUsers() {
         return this.userService.deleteAllUsers();

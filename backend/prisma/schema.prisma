@@ -24,6 +24,9 @@ model Room {
   name  String @unique
   users User[] @relation("UserRoom")
   messages Message[]
+  type  String
+  isPrivate Boolean
+  password String?
 }
 
 model Message {

@@ -43,6 +43,7 @@ export class ChatGateway implements OnGatewayInit {
   }
 
   async isMember(roomID: number, userId: number) {
+    console.log("isMember: roomID", roomID);
     return this.roomService.getRoomById(roomID).then((room) => {
       return room.users.find((u) => u.id === userId);
     });
@@ -118,7 +119,7 @@ export class ChatGateway implements OnGatewayInit {
           });
         }
         this.roomService.getAllRooms().then((rooms) => {
-          // substract rooms that user is already in
+          // substract rooms that user is already in (public + protected)
           rooms = rooms.filter((r) => !r.users.find((u) => u.id === userId));
           this.server.to(x.id).emit('allRooms', rooms);
         });

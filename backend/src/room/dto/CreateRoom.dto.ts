@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 
 export class CreateRoomDto {
@@ -6,4 +6,9 @@ export class CreateRoomDto {
     @IsNotEmpty()
     name: string;
     users: number[];
+    @IsNotEmpty()
+    type: string;
+    @IsBoolean()
+    isPrivate: boolean;
+    password: string;
 }

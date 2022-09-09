@@ -39,7 +39,7 @@ export class RoomService {
     async getRoomById(roomId: any) {
         return this.prisma.room.findUnique({
             where: {
-                id: parseInt(roomId),
+                id: roomId,
             },
             include: {
                 users: true,

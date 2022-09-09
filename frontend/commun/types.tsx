@@ -8,6 +8,9 @@ interface IRoom {
     id: number;
     name: string;
     users: number[];
+    type: string;
+    isPrivate: boolean;
+    password: string;
 }
 
 interface IMessage {

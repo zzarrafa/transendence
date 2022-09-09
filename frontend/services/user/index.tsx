@@ -13,11 +13,19 @@ async function getAllUsers() {
 async function getUserByUsername(username: string) {
     const response = await fetch(`${apiUrl}user/${username}`);
     const data = await response.json();
-    // console.log(data);
+    console.log(data);
+    return data;
+}
+
+async function getUserById(id: number) {
+    const response = await fetch(`${apiUrl}user/id/${id}`);
+    const data = await response.json();
+    console.log(data);
     return data;
 }
 
 export {
     getAllUsers,
-    getUserByUsername
+    getUserByUsername,
+    getUserById,
 }

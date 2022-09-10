@@ -31,7 +31,8 @@ export class ChatGateway implements OnGatewayInit {
       this.server.to(client.id).emit('rooms', rooms);
     });
     this.roomService.getAllRooms().then((rooms) => {
-      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
+      // substract rooms that user is already in (public + protected) && not DM
+      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM");
       this.server.to(client.id).emit('allRooms', rooms);
     }
     );
@@ -43,7 +44,6 @@ export class ChatGateway implements OnGatewayInit {
   }
 
   async isMember(roomID: number, userId: number) {
-    console.log("isMember: roomID", roomID);
     return this.roomService.getRoomById(roomID).then((room) => {
       return room.users.find((u) => u.id === userId);
     });
@@ -80,7 +80,7 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM");
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );
@@ -95,7 +95,7 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id));
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM")
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );
@@ -120,7 +120,7 @@ export class ChatGateway implements OnGatewayInit {
         }
         this.roomService.getAllRooms().then((rooms) => {
           // substract rooms that user is already in (public + protected)
-          rooms = rooms.filter((r) => !r.users.find((u) => u.id === userId));
+          rooms = rooms.filter((r) => !r.users.find((u) => u.id === userId) && r.type !== "DM")
           this.server.to(x.id).emit('allRooms', rooms);
         });
       }

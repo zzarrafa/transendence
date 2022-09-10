@@ -38,6 +38,7 @@ function Chat() {
   const [allRooms, setAllRooms] = useState<IRoom[]>([]);
   const [socket, setSocket] = useState<Socket>();
   const [showRoomContent, setShowRoomContent] = useState(false);
+  const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
 
   useEffect(()=> {
     setSocket(io("http://localhost:8000/chat", {
@@ -50,7 +51,14 @@ function Chat() {
   useEffect(()=> {
     if (socket) {
       socket.on("rooms", (rooms: IRoom[]) => {
-        setUserRooms(rooms);
+      const nonDmRooms = rooms.filter((room) => {
+        return room.type !== "DM";
+      })
+      setUserRooms(nonDmRooms)
+      const dmRooms = rooms.filter((room) => {
+          return room.type == "DM"
+      })
+      setDmRooms(dmRooms);
       });
 
       socket.on("allRooms", (rooms: IRoom[]) => {
@@ -135,7 +143,9 @@ function Chat() {
       room: {
         name: roomName,
         users: selectedUsers,
-        type: "GROUP"
+        type: "GROUP",
+        isPrivate: false,
+        password: "",
       },
       creatorId: connectUserId,
     };
@@ -245,7 +255,7 @@ function Chat() {
       </form>
       <h1>User Rooms (Group)</h1>
       <Box>
-        <div id='rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
+        <div id='public_rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
           {
             userRooms.map((room: IRoom, index) => {
               return (
@@ -307,7 +317,26 @@ function Chat() {
         </Box>
       }
       <h1>DM Rooms</h1>
-      
+      <Box>
+        <div id='DMrooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
+          {
+            dmRooms.map((room: IRoom, index) => {
+              return (
+                <Box key={index}>
+                  <Button
+                    variant={selectedRoom?.name === room.name ? "contained" : "outlined"}
+                    color= "secondary"
+                    key={room.name}
+                    onClick={() => handleClickRoom(room)}
+                  >
+                    {room.name}
+                  </Button>
+                </Box>
+              );
+            })
+          }
+        </div>
+      </Box>
     </Box>
   );
 }

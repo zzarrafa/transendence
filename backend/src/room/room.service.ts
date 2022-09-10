@@ -21,11 +21,18 @@ export class RoomService {
     }
 
     async getRoomsForUser(userId: any) {
-        return this.prisma.user.findUnique({
+        return this.prisma.room.findMany({
             where: {
-                id: parseInt(userId),
+                users: {
+                    some: {
+                        id: parseInt(userId),
+                    },
+                },
             },
-        }).rooms();
+            include: {
+                users: true,
+            },
+        });
     }
     
     async getAllRooms() {

@@ -6,6 +6,7 @@ import { Box } from "@mui/system";
 import { io, Socket } from "socket.io-client";
 import moment from "moment";
 import { IMessage, IRoom, IUser } from '../../commun/types';
+import { getRoomsForUser } from '../../services/room';
 
 
 
@@ -15,10 +16,12 @@ const Profile = () => {
     const [user, setUser] = useState<IUser>();
     const [showForm, setShowForm] = useState(false)
     const [message, setMessage] = useState("");
-    const [connectUserId, setConnectUserId] = useState(1);
+    const [connectedUserId, setConnectedUserId] = useState(1);
     const [socket, setSocket] = useState < Socket > ();
     const [messages, setMessages] = useState<{ [key: number]: IMessage[] }>({});
     const [room, setRoom] = useState<IRoom>();
+    const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
+
 
 
     useEffect(() => {
@@ -31,8 +34,7 @@ const Profile = () => {
 
     useEffect(() => {
         if (socket) {
-            // get all DM ROOMS
-            // socket.on("")
+
             socket.on("messages", (data) => {
                 setMessages((messages) => {
                     return {
@@ -43,23 +45,21 @@ const Profile = () => {
             });
             socket.on("createdRoom", (room) => {
                 console.log("createdRoom:", room)
-                setRoom(room.id);
+                setRoom(room);
             });
         }
     }, [socket]);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        setConnectUserId(user.id);
-    }, []);
+        const tmpUser = JSON.parse(localStorage.getItem('user') || '{}');
+        setConnectedUserId(tmpUser.id);
+        getRoomsForUser(tmpUser.id).then((rooms) => {
+            const dmRooms = rooms.filter((room: IRoom) => room.type === "DM");
+            console.log("dmrooms: ", dmRooms);
+            setDmRooms(dmRooms);
+        });
 
-    useEffect(() => {
-        if (userId) {
-            getUserById(userId).then((data) => {
-                setUser(data);
-            });
-        }
-    }, [userId]);
+    }, []);
 
     const sendMessage = () => {
         setShowForm(true);
@@ -69,25 +69,45 @@ const Profile = () => {
             socket!.emit("createMessage", {
                 room: room.id,
                 content: message,
-                creatorId: connectUserId,
+                user: connectedUserId,
             });
         }
     }, [room])
 
+    useEffect(()=> {
+        if (userId) {
+            getUserById(userId).then((user) => {
+                setUser(user);
+            });
+        }
+    }, [userId])
     const createMessage = (e: any) => {
         e.preventDefault();
         const data = {
             room: {
-                name: "DM_3",
+                name: "DM"+connectedUserId+"-"+userId,
                 users: [userId],
                 type: "DM",
                 isPrivate: true,
                 password: "",
             },
-            creatorId: connectUserId,
+            creatorId: connectedUserId,
         };
-        // first time
-        socket!.emit("createRoom", data);
+        const tmpRoom = dmRooms.find((room) => {
+            console.log("room: ", room.users);
+            // @ts-ignore
+            return room.users.find((user: IUser) => user.id === userId);
+        });
+        console.log("filtred rooms", tmpRoom);
+
+        if (tmpRoom) {
+            console.log("room found: ", tmpRoom);
+            setRoom(tmpRoom);
+        }
+        else {
+            console.log("room not found: ", tmpRoom)
+            socket!.emit("createRoom", data);
+        }
     }
 
     const formatTime = (time: string) => {
@@ -104,33 +124,30 @@ const Profile = () => {
     return (
         <Box sx={{ padding: "10px" }}>
             <h1>Profile</h1>
-            {user && (
+            <div>
                 <div>
-                    <div>
-                        <ul id='messages'>
-                            {room && messages[room.id] &&
-                                messages[room.id].map((msg: IMessage, index) => {
-                                    return (
-                                        <li key={index}>
-                                            <b>{msg.user.username}</b> : {msg.content} <span>{formatTime(msg.createdAt.toString())}</span>
-                                        </li>
-                                    );
-                                })}
-                        </ul>
-                    </div>
-                    <div className="profile-container">
-                        <p>{user ? user.name : ""}</p>
-                        <Button onClick={sendMessage} variant="contained">Message</Button>
-                        <form onSubmit={(e) => createMessage(e)} style=
-                            {{ display: showForm ? "flex" : "none", gap: "5px", alignItems: "center", marginTop: "10px" }}>
-                            <TextField label="Message" variant="outlined"
-                                value={message} onChange={(e) => setMessage(e.target.value)}
-                            />
-                            <Button variant="contained" type='submit' style={{ height: "40px" }}>Send</Button>
-                        </form>
-                    </div>
+                    <ul id='messages'>
+                        {room && messages[room.id] &&
+                            messages[room.id].map((msg: IMessage, index) => {
+                                return (
+                                    <li key={index}>
+                                        <b>{msg.user.username}</b> : {msg.content} <span>{formatTime(msg.createdAt.toString())}</span>
+                                    </li>
+                                );
+                            })}
+                    </ul>
                 </div>
-            )}
+                <div className="profile-container">
+                    <Button onClick={sendMessage} variant="contained">Message</Button>
+                    <form onSubmit={(e) => createMessage(e)} style=
+                        {{ display: showForm ? "flex" : "none", gap: "5px", alignItems: "center", marginTop: "10px" }}>
+                        <TextField label="Message" variant="outlined"
+                            value={message} onChange={(e) => setMessage(e.target.value)}
+                        />
+                        <Button variant="contained" type='submit' style={{ height: "40px" }}>Send</Button>
+                    </form>
+                </div>
+            </div>
         </Box>
     );
 }

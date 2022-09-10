@@ -28,7 +28,6 @@ let RequestController = class RequestController {
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Post)('add/:id'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -37,7 +36,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RequestController.prototype, "addFriend", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Post)('remove/:id'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -47,6 +45,7 @@ __decorate([
 ], RequestController.prototype, "removeFriend", null);
 RequestController = __decorate([
     (0, common_1.Controller)('request'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     __metadata("design:paramtypes", [request_service_1.RequestService])
 ], RequestController);
 exports.RequestController = RequestController;

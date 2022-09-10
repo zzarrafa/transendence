@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const user_service_1 = require("./user.service");
 const jwt_guard_1 = require("../../login/guards/jwt.guard");
-const fs_1 = require("fs");
+const fs = require("fs");
+const multer_1 = require("multer");
+const config_1 = require("@nestjs/config");
 let UserController = class UserController {
-    constructor(userService) {
+    constructor(userService, config) {
         this.userService = userService;
+        this.config = config;
     }
     async getAllUsers(req) {
         return this.userService.getAllUsers();
@@ -43,16 +46,20 @@ let UserController = class UserController {
         };
         return data;
     }
-    async updateProfilePic(request, imageName, picture) {
-        fs_1.default.writeFileSync(process.cwd() + "/public/" + imageName, picture.buffer);
-        return this.userService.updaatepicture(request.user.id, imageName);
+    async updateProfilePic(request, picture) {
+        const type = picture.mimetype.split('/')[1];
+        fs.rename(picture.path, picture.destination + '/' + request.user.id + '.' + type, function (err) {
+            if (err)
+                throw err;
+        });
+        const path = this.config.get('PICPATH') + request.user.id + '.' + type;
+        return this.userService.updaatepicture(request.user.id, path);
     }
     async updateDisplayName(request, displayName) {
         return this.userService.UpdateDisplayName(request.user.id, displayName['displayName']);
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Get)('users'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -60,15 +67,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllUsers", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
-    (0, common_1.Get)('profilee'),
+    (0, common_1.Get)('profile'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getProfile", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Get)('/profilee/:id'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -77,19 +82,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getProfileById", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
-    (0, common_1.Post)('profilee/picture/:imageName'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('picture')),
+    (0, common_1.Post)('profile/picture/'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('picture', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './public/uploads',
+        }),
+    })),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Param)('imageName')),
-    __param(2, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateProfilePic", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
-    (0, common_1.Post)('profilee/displayName'),
+    (0, common_1.Post)('profile/displayName'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -98,7 +104,8 @@ __decorate([
 ], UserController.prototype, "updateDisplayName", null);
 UserController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [user_service_1.UserService])
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    __metadata("design:paramtypes", [user_service_1.UserService, config_1.ConfigService])
 ], UserController);
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

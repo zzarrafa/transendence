@@ -5,6 +5,7 @@ import {
   Req,
   UseGuards,
   Body,
+  Get,
 }
   from '@nestjs/common';
 import {UnauthorizedException} from '@nestjs/common';
@@ -18,14 +19,15 @@ import { LoginService } from 'src/login/login.service';
 
 
 @Controller('2fa')
+@UseGuards(JwtGuard)
 export class TwoFactController {
   constructor(
     private readonly twoFactorAuthenticationService: TwoFactService, private readonly usersService: UserService ,private loginService: LoginService
   
     
   ) { }
-  @UseGuards(JwtGuard)
-  @Post('generate')
+// @UseGuards(JwtGuard)
+  @Get('generate')
   async register(@Res() response: Response, @Req() request) {
 
     const user = request.user;
@@ -33,7 +35,7 @@ export class TwoFactController {
     
     return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
   }
-  @UseGuards(JwtGuard)
+  
   @Post('enable')
   async turnOnTwoFactorAuthentication(
     @Req() request,
@@ -50,7 +52,6 @@ export class TwoFactController {
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
 
-  @UseGuards(JwtGuard)
   @Post('authenticate')
   async authenticate( @Req() request, @Body() twoFactorAuthenticationCode) {
     const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid( twoFactorAuthenticationCode['code'], request.user.twoFactorAuthenticationSecret);
@@ -59,9 +60,7 @@ export class TwoFactController {
       throw new UnauthorizedException('Wrong authentication code');
     }
     const accessTokenCookie = this.loginService.getCookieWithJwtAccessToken(request.user.id, true);
- 
-    request.res.setHeader('Set-Cookie', [accessTokenCookie]);
- 
+    request.res.cookie('Authentication', accessTokenCookie, { httpOnly: true, path: '/' });
     return request.user;
 }
 

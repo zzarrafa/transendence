@@ -4,17 +4,15 @@ import { JwtGuard } from 'src/login/guards/jwt.guard';
 
 
 @Controller('request')
+@UseGuards(JwtGuard)
 export class RequestController {
     constructor(private requestService: RequestService) {}
 
-
-    @UseGuards(JwtGuard)
     @Post('add/:id')
     async addFriend(@Req() request, @Param('id', ParseIntPipe) id: number) {
         return this.requestService.addFriend(request.user, id);
     }
     // delete friend
-    @UseGuards(JwtGuard)
     @Post('remove/:id')
     async removeFriend(@Req() request, @Param('id', ParseIntPipe) id: number) {
         return this.requestService.removeFriend(request.user, id);

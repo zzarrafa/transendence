@@ -11,31 +11,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginController = void 0;
 const common_1 = require("@nestjs/common");
-const authenticated_guard_1 = require("./guards/authenticated.guard");
 const dto_1 = require("./dto");
 const ft_oauth_guard_1 = require("./guards/ft-oauth.guard");
 const login_service_1 = require("./login.service");
 const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
+const user_service_1 = require("../User/user/user.service");
+const user_status_enum_1 = require("../User/user/user_status.enum");
+const jwt_guard_1 = require("./guards/jwt.guard");
+const logout = require('express-passport-logout');
 let LoginController = class LoginController {
-    constructor(loginService) {
+    constructor(loginService, userService) {
         this.loginService = loginService;
+        this.userService = userService;
     }
     ftAuth() {
         return;
     }
-    ftAuthCallback(user) {
-        return;
+    async logOut(request) {
+        this.userService.updateStatus(request.user.id, user_status_enum_1.UserStatus.OFFLINE);
+        await logout();
+        request.res.clearCookie('Authentication');
+        console.log("logout");
     }
-    logOut(req) {
-        req.logOut();
-    }
-    login(dto, user) {
-        return this.loginService.login(dto, user);
+    login(dto, user, request) {
+        return this.loginService.login(dto, user, request);
     }
 };
 __decorate([
@@ -46,33 +50,27 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], LoginController.prototype, "ftAuth", null);
 __decorate([
-    (0, common_1.Get)('42/return'),
-    (0, common_1.UseGuards)(ft_oauth_guard_1.FtOauthGuard),
-    (0, common_1.Redirect)('/'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object]),
-    __metadata("design:returntype", void 0)
-], LoginController.prototype, "ftAuthCallback", null);
-__decorate([
     (0, common_1.Get)('logout'),
-    (0, common_1.Redirect)('/'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], LoginController.prototype, "logOut", null);
 __decorate([
-    (0, common_1.Get)('user/register'),
-    (0, common_1.UseGuards)(authenticated_guard_1.AuthenticatedGuard),
+    (0, common_1.Get)('42/return'),
+    (0, common_1.UseGuards)(ft_oauth_guard_1.FtOauthGuard),
+    (0, common_1.Redirect)('/'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, user_decorator_1.Userr)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_b = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object]),
     __metadata("design:returntype", void 0)
 ], LoginController.prototype, "login", null);
 LoginController = __decorate([
     (0, common_1.Controller)('login'),
-    __metadata("design:paramtypes", [login_service_1.LoginService])
+    __metadata("design:paramtypes", [login_service_1.LoginService, user_service_1.UserService])
 ], LoginController);
 exports.LoginController = LoginController;
 //# sourceMappingURL=login.controller.js.map

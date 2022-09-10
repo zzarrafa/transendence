@@ -44,13 +44,12 @@ let TwoFactController = class TwoFactController {
             throw new common_2.UnauthorizedException('Wrong authentication code');
         }
         const accessTokenCookie = this.loginService.getCookieWithJwtAccessToken(request.user.id, true);
-        request.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        request.res.cookie('Authentication', accessTokenCookie, { httpOnly: true, path: '/' });
         return request.user;
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
-    (0, common_1.Post)('generate'),
+    (0, common_1.Get)('generate'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -58,7 +57,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "register", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Post)('enable'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -67,7 +65,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "turnOnTwoFactorAuthentication", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Post)('authenticate'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -77,6 +74,7 @@ __decorate([
 ], TwoFactController.prototype, "authenticate", null);
 TwoFactController = __decorate([
     (0, common_1.Controller)('2fa'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     __metadata("design:paramtypes", [two_fact_service_1.TwoFactService, user_service_1.UserService, login_service_1.LoginService])
 ], TwoFactController);
 exports.TwoFactController = TwoFactController;

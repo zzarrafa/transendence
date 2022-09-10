@@ -18,6 +18,8 @@ const jwt_strategy_1 = require("./jwt/jwt.strategy");
 const config_2 = require("@nestjs/config");
 const prisma_module_1 = require("../prisma/prisma.module");
 const axios_1 = require("@nestjs/axios");
+const user_service_1 = require("../User/user/user.service");
+const user_module_1 = require("../User/user/user.module");
 let LoginModule = class LoginModule {
 };
 LoginModule = __decorate([
@@ -26,9 +28,10 @@ LoginModule = __decorate([
             config_2.ConfigModule.forRoot({ isGlobal: true }),
             axios_1.HttpModule,
             prisma_module_1.PrismaModule,
+            user_module_1.UserModule
         ],
         controllers: [login_controller_1.LoginController],
-        providers: [config_1.ConfigService, ft_strategy_1.FtStrategy, session_serializer_1.SessionSerializer, login_service_1.LoginService, jwt_strategy_1.JwtStrategy],
+        providers: [config_1.ConfigService, ft_strategy_1.FtStrategy, session_serializer_1.SessionSerializer, login_service_1.LoginService, jwt_strategy_1.JwtStrategy, user_service_1.UserService],
     })
 ], LoginModule);
 exports.LoginModule = LoginModule;

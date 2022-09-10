@@ -88,10 +88,10 @@ async getLevel(id: number) {
 async updateStatus(id: number, status: UserStatus) {
     const user = await this.prisma.user.update({
         where: {
-            id,
+            id : id,
         },
         data: {
-            status,
+            status :status,
         },
     });
     return user;

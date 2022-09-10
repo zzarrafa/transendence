@@ -5,39 +5,45 @@ import { FtOauthGuard } from './guards/ft-oauth.guard';
 import {LoginService} from './login.service';
 import { Userr } from './decorators/user.decorator';
 import { Profile } from 'passport-42';
-import { HttpService } from '@nestjs/axios';
+import { UserService } from 'src/User/user/user.service';
+import { UserStatus } from 'src/User/user/user_status.enum';
 import { JwtGuard } from './guards/jwt.guard';
-import { Request, Response } from 'express';
+const logout = require('express-passport-logout');
 
 
 @Controller('login')
 export class LoginController {
-  constructor( private loginService: LoginService){}
+  constructor( private loginService: LoginService, private userService : UserService){}
   @Get('42')
   @UseGuards(FtOauthGuard)
   ftAuth() {
     return;
   }
 
-  @Get('42/return')
-  @UseGuards(FtOauthGuard)
-  @Redirect('/')
-  ftAuthCallback(user : Profile) {
-    return ;
-  }
+  // @Get('42/return')
+  // @UseGuards(FtOauthGuard)
+  // @Redirect('/')
+  // ftAuthCallback(user : Profile) {
+  //   return ;
+  // }
 
   
   @Get('logout')
-  @Redirect('/')
-  logOut(@Req() req: Request) {
-    req.logOut();
+  @UseGuards(JwtGuard)
+  // @Redirect('/')
+  async logOut(@Req() request) {
+    this.userService.updateStatus(request.user.id, UserStatus.OFFLINE);
+    await logout();
+    //clear cookie
+    request.res.clearCookie('Authentication');
+    console.log("logout");
   }
 
-  
-  @Get('user/register')
-  @UseGuards(AuthenticatedGuard)
-  login(@Body() dto: LogDto,@Userr() user: Profile) {
-      return this.loginService.login(dto,user);
+  // hna '/login' ghir ma9dertch nbedel smia hit deja dayraha f  api url callback
+  @Get('42/return')
+  @UseGuards(FtOauthGuard)
+  @Redirect('/')
+  login(@Body() dto: LogDto,@Userr() user: Profile, @Req() request) {
+    return this.loginService.login(dto,user,request);
     }
-
 }

@@ -1,9 +1,11 @@
 /// <reference types="multer" />
 import { UserService } from './user.service';
 import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 export declare class UserController {
     private userService;
-    constructor(userService: UserService);
+    private config;
+    constructor(userService: UserService, config: ConfigService);
     getAllUsers(req: Request): Promise<{
         displayName: string;
         email: string;
@@ -18,6 +20,6 @@ export declare class UserController {
         wins: number;
         loses: number;
     }>;
-    updateProfilePic(request: any, imageName: string, picture: Express.Multer.File): Promise<import(".prisma/client").User>;
+    updateProfilePic(request: any, picture: Express.Multer.File): Promise<import(".prisma/client").User>;
     updateDisplayName(request: any, displayName: any): Promise<import(".prisma/client").User>;
 }

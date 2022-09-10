@@ -21,29 +21,34 @@ const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
+const user_service_1 = require("../User/user/user.service");
+const user_status_enum_1 = require("../User/user/user_status.enum");
 let LoginService = class LoginService {
-    constructor(prisma, jwt, config) {
+    constructor(prisma, jwt, config, userService) {
         this.prisma = prisma;
         this.jwt = jwt;
         this.config = config;
+        this.userService = userService;
     }
-    async login(logDto, userr) {
+    async login(logDto, userr, request) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
             },
         });
         if (users) {
-            return this.getCookieWithJwtAccessToken(users.id);
+            this.userService.updateStatus(users.id, user_status_enum_1.UserStatus.ONLINE);
+            const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
+            request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }
         else {
             let users = await this.prisma.user.create({
                 data: {
                     email: userr.emails[0].value,
                     displayName: '',
-                    picture: this.isEmpty(logDto.picture) ? userr.photos[0].value : logDto.picture,
+                    picture: userr.photos[0].value,
                     level: 0,
-                    status: 'online',
+                    status: '',
                     wins: 0,
                     loses: 0,
                     role: 'player',
@@ -51,18 +56,17 @@ let LoginService = class LoginService {
                     isTwoFactorAuthenticationEnabled: false
                 },
             });
-            return this.getCookieWithJwtAccessToken(users.id);
+            this.userService.updateStatus(users.id, user_status_enum_1.UserStatus.ONLINE);
+            const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
+            request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }
     }
-    isEmpty(str) {
-        return (!str || str.length === 0);
-    }
-    getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
+    async getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
         const payload = {
             sub: userId,
             isSecondFactorAuthenticated
         };
-        const token = this.jwt.signAsync(payload, {
+        const token = await this.jwt.signAsync(payload, {
             secret: this.config.get('JWT_SECRET'),
             expiresIn: '30m',
         });
@@ -71,13 +75,14 @@ let LoginService = class LoginService {
 };
 __decorate([
     __param(1, (0, user_decorator_1.Userr)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object]),
     __metadata("design:returntype", Promise)
 ], LoginService.prototype, "login", null);
 LoginService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, user_service_1.UserService])
 ], LoginService);
 exports.LoginService = LoginService;
 //# sourceMappingURL=login.service.js.map

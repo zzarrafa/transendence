@@ -95,10 +95,10 @@ let UserService = class UserService {
     async updateStatus(id, status) {
         const user = await this.prisma.user.update({
             where: {
-                id,
+                id: id,
             },
             data: {
-                status,
+                status: status,
             },
         });
         return user;

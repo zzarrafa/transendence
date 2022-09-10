@@ -9,6 +9,8 @@ import { JwtStrategy } from "./jwt/jwt.strategy";
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { HttpModule } from '@nestjs/axios';
+import { UserService } from 'src/User/user/user.service';
+import { UserModule } from 'src/User/user/user.module';
 
  
 @Module({
@@ -16,8 +18,9 @@ import { HttpModule } from '@nestjs/axios';
     ConfigModule.forRoot({isGlobal: true}),
     HttpModule,
     PrismaModule,
+    UserModule
   ],
   controllers: [LoginController],
-  providers: [ConfigService, FtStrategy, SessionSerializer, LoginService, JwtStrategy],
+  providers: [ConfigService, FtStrategy, SessionSerializer, LoginService, JwtStrategy, UserService],
 })
 export class LoginModule {}

@@ -8,7 +8,7 @@ TODO:
 
 
 
-- DM message (search user and send him msg (not a blocked user))
+- DM message (search user and send him msg (not a blocked user (A FAIRE))): DONE
 - Private Room
 - protected Room by password
 - block user (he can see new messages)

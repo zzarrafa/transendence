@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button, Input, OutlinedInput,InputLabel, MenuItem, FormControl } from "@mui/material";
+import { Button, TextField, OutlinedInput,InputLabel, MenuItem, FormControl, Checkbox, FormGroup, FormControlLabel} from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-// import { form } from 'formik'
 import { Box } from "@mui/system";
 import React from "react";
 import { io, Socket } from "socket.io-client";
@@ -39,6 +38,9 @@ function Chat() {
   const [socket, setSocket] = useState<Socket>();
   const [showRoomContent, setShowRoomContent] = useState(false);
   const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
+  const [checked, setChecked] = useState(true);
+  const [password, setPassword] = useState("")
+
 
   useEffect(()=> {
     setSocket(io("http://localhost:8000/chat", {
@@ -144,8 +146,8 @@ function Chat() {
         name: roomName,
         users: selectedUsers,
         type: "GROUP",
-        isPrivate: false,
-        password: "",
+        isPrivate: checked,
+        password: password,
       },
       creatorId: connectUserId,
     };
@@ -154,6 +156,8 @@ function Chat() {
     setShowForm(false);
     setSelectedUsers([]);
     setPersonName([]);
+    setChecked(true);
+    setPassword("");
   };
 
   const handleClickRoom = (room: IRoom) => {
@@ -175,6 +179,14 @@ function Chat() {
     }))
   };
 
+  const handleChangeCheckBox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+
+  const handleChangePassword = (e: any) => {
+    setPassword(e.target.value);
+  }
+
   return (
     <Box
       sx={{
@@ -191,41 +203,18 @@ function Chat() {
       )}
       <Search></Search>
       <Box sx={{marginTop: "5px"}}>
-        <div style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
+        <div style={{display: "flex", justifyContent: "space-between", gap: "5px", marginBottom: "10px"}}>
           <Button variant="contained" onClick={toggleVisibility}>Create Room</Button>
         </div>
       </Box>
-      <h1>All Rooms</h1>
-      <Box>
-        <div id='rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
-          {
-            allRooms.map((room: IRoom, index: number ) => {
-              return (
-                <Box sx={{display: "flex", gap: "5px"}} key={index}>
-                    <Button
-                      variant= "outlined"
-                      color= "secondary"
-                      key={room.name}
-                    >
-                      {room.name}
-                    </Button>
-                    <Button variant="outlined" onClick={()=> JoinRoom(room.id)}> Join </Button>
-                </Box>
-              );
-            })
-          }
-        </div>
-      </Box>
-      
       <form
         onSubmit={(e) => createRoom(e)}
         style={{ display: showForm ? "flex" : "none", flexDirection: "column" }}
       >
-        <Input
-          type='text'
-          placeholder='Room Name'
+        <TextField
+          label="Room Name"
           value={roomName}
-          onChange={(e) => setRoomName(e.target.value)}
+          onChange={(e:any) => setRoomName(e.target.value)}
           style={{ marginBottom: "10px" }}
         />
         <div>
@@ -251,8 +240,41 @@ function Chat() {
             </Select>
           </FormControl>
         </div>
+        <FormGroup>
+          <FormControlLabel control={
+            <Checkbox checked={checked}  onChange={handleChangeCheckBox} inputProps={{ 'aria-label': 'controlled' }}/>} label="Private" />
+        </FormGroup>
+          {/* input fieled for password */}
+          <TextField
+            id="password"
+            label="Password"
+            value={password}
+            onChange={handleChangePassword}
+            style={{ marginBottom: "5px" }}
+          />
         <Button type="submit" variant="contained">Create</Button>
       </form>
+      <h1>All Rooms</h1>
+      <Box>
+        <div id='rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
+          {
+            allRooms.map((room: IRoom, index: number ) => {
+              return (
+                <Box sx={{display: "flex", gap: "5px"}} key={index}>
+                    <Button
+                      variant= "outlined"
+                      color= "secondary"
+                      key={room.name}
+                    >
+                      {room.name}
+                    </Button>
+                    <Button variant="outlined" onClick={()=> JoinRoom(room.id)}> Join </Button>
+                </Box>
+              );
+            })
+          }
+        </div>
+      </Box>
       <h1>User Rooms (Group)</h1>
       <Box>
         <div id='public_rooms' style={{display: "flex", justifyContent: "space-between", gap: "5px"}}>
@@ -302,8 +324,7 @@ function Chat() {
           </Box>
           <Box>
             <form onSubmit={(e) => createMessage(e)}>
-              <Input
-                type='text'
+              <TextField
                 placeholder='Type a message...'
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}

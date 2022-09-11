@@ -24,6 +24,7 @@ export class MessageService {
         });
     }
 
+    // TODO: Sort Message by date
     async getMessagesForRoom(roomId: any) {
         return this.prisma.message.findMany({
             where: {

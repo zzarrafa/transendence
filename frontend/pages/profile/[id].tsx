@@ -7,6 +7,7 @@ import { io, Socket } from "socket.io-client";
 import moment from "moment";
 import { IMessage, IRoom, IUser } from '../../commun/types';
 import { getRoomsForUser } from '../../services/room';
+import { getMessagesForRoom }  from '../../services/message'
 
 
 
@@ -20,9 +21,6 @@ const Profile = () => {
     const [socket, setSocket] = useState < Socket > ();
     const [messages, setMessages] = useState<{ [key: number]: IMessage[] }>({});
     const [room, setRoom] = useState<IRoom>();
-    const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
-
-
 
     useEffect(() => {
         setSocket(io("http://localhost:8000/chat", {
@@ -34,45 +32,25 @@ const Profile = () => {
 
     useEffect(() => {
         if (socket) {
-
             socket.on("messages", (data) => {
-                setMessages((messages) => {
-                    return {
-                        ...messages,
-                        [data.room]: data.messages,
-                    };
-                });
+                console.log("------> room: ", room);
+                if (room && data.room == room.id) {
+                    setMessages((messages) => {
+                        return {
+                            ...messages,
+                            [data.room]: data.messages,
+                        };
+                    });
+                }
             });
             socket.on("createdRoom", (room) => {
-                console.log("createdRoom:", room)
-                setRoom(room);
+                if (room.name == "DM"+connectedUserId+"-"+userId && room.type == "DM" ) {
+                    console.log("create ROOM then create message")
+                    setRoom(room);
+                }
             });
         }
-    }, [socket]);
-
-    useEffect(() => {
-        const tmpUser = JSON.parse(localStorage.getItem('user') || '{}');
-        setConnectedUserId(tmpUser.id);
-        getRoomsForUser(tmpUser.id).then((rooms) => {
-            const dmRooms = rooms.filter((room: IRoom) => room.type === "DM");
-            console.log("dmrooms: ", dmRooms);
-            setDmRooms(dmRooms);
-        });
-
-    }, []);
-
-    const sendMessage = () => {
-        setShowForm(true);
-    }
-    useEffect(()=> {
-        if (room) {
-            socket!.emit("createMessage", {
-                room: room.id,
-                content: message,
-                user: connectedUserId,
-            });
-        }
-    }, [room])
+    }, [socket, room]);
 
     useEffect(()=> {
         if (userId) {
@@ -81,6 +59,42 @@ const Profile = () => {
             });
         }
     }, [userId])
+
+    useEffect(() => {
+        const tmpUser = JSON.parse(localStorage.getItem('user') || '{}');
+        setConnectedUserId(tmpUser.id);
+        getRoomsForUser(tmpUser.id).then((rooms) => {
+            const dmRooms = rooms.filter((room: IRoom) => room.type === "DM");
+            const tmpRoom = dmRooms.find((room: IRoom) => {
+                // @ts-ignore
+                return room.users.find((user: IUser) =>  user.id === userId);
+            });
+            if (tmpRoom && showForm) {
+                console.log("rooom already exist:)")
+                getMessagesForRoom(tmpRoom.id).then((data) => {
+                    setMessages((messages) => {
+                        return {
+                            ...messages,
+                            [tmpRoom.id]: data,
+                            };
+                        });
+                });
+                setRoom(tmpRoom);
+            }
+        });
+    }, [showForm]);
+
+    useEffect(() => {
+        if (room && message) {
+            socket!.emit("createMessage", {
+                room: room.id,
+                content: message,
+                user: connectedUserId,
+            });
+            setMessage("")
+        }
+    }, [room]);
+
     const createMessage = (e: any) => {
         e.preventDefault();
         const data = {
@@ -93,23 +107,24 @@ const Profile = () => {
             },
             creatorId: connectedUserId,
         };
-        const tmpRoom = dmRooms.find((room) => {
-            console.log("room: ", room.users);
-            // @ts-ignore
-            return room.users.find((user: IUser) => user.id === userId);
-        });
-        console.log("filtred rooms", tmpRoom);
+        if (room === undefined) {
+            socket!.emit("createRoom", data);
 
-        if (tmpRoom) {
-            console.log("room found: ", tmpRoom);
-            setRoom(tmpRoom);
         }
         else {
-            console.log("room not found: ", tmpRoom)
-            socket!.emit("createRoom", data);
+            console.log("room:", room)
+            socket!.emit("createMessage", {
+                room: room.id,
+                content: message,
+                user: connectedUserId,
+            });
+            setMessage("")
         }
     }
 
+    const sendMessage = () => {
+        setShowForm(true);
+    }
     const formatTime = (time: string) => {
         return (moment(time).calendar(null, {
             sameDay: 'LT',
@@ -124,6 +139,7 @@ const Profile = () => {
     return (
         <Box sx={{ padding: "10px" }}>
             <h1>Profile</h1>
+            <h2>{user?.username}</h2>
             <div>
                 <div>
                     <ul id='messages'>

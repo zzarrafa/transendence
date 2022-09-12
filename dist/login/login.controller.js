@@ -21,7 +21,6 @@ const login_service_1 = require("./login.service");
 const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
 const user_service_1 = require("../User/user/user.service");
-const user_status_enum_1 = require("../User/user/user_status.enum");
 const jwt_guard_1 = require("./guards/jwt.guard");
 const logout = require('express-passport-logout');
 let LoginController = class LoginController {
@@ -33,7 +32,6 @@ let LoginController = class LoginController {
         return;
     }
     async logOut(request) {
-        this.userService.updateStatus(request.user.id, user_status_enum_1.UserStatus.OFFLINE);
         await logout();
         request.res.clearCookie('Authentication');
         console.log("logout");

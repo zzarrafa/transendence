@@ -28,6 +28,7 @@ let TwoFactController = class TwoFactController {
     async register(response, request) {
         const user = request.user;
         const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(user);
+        console.log('===>', user.id);
         return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
     }
     async turnOnTwoFactorAuthentication(request, twoFactorAuthenticationCode) {
@@ -73,8 +74,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "authenticate", null);
 TwoFactController = __decorate([
-    (0, common_1.Controller)('2fa'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Controller)('2fa'),
     __metadata("design:paramtypes", [two_fact_service_1.TwoFactService, user_service_1.UserService, login_service_1.LoginService])
 ], TwoFactController);
 exports.TwoFactController = TwoFactController;

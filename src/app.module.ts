@@ -12,6 +12,7 @@ import { TwoFactService } from './twofactorAuth/two-fact/two-fact.service';
 import { TwoFactModule } from './twofactorAuth/two-fact/two-fact.module';
 import { RequestModule } from './Relationship/request/request.module';
 import { RequestService } from './Relationship/request/request.service';
+import { UserGateway } from './User/user/user.gateway';
 @Module({
   imports: [
     ConfigModule.forRoot({

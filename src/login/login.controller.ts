@@ -32,7 +32,6 @@ export class LoginController {
   @UseGuards(JwtGuard)
   // @Redirect('/')
   async logOut(@Req() request) {
-    this.userService.updateStatus(request.user.id, UserStatus.OFFLINE);
     await logout();
     //clear cookie
     request.res.clearCookie('Authentication');

@@ -24,7 +24,7 @@ export class LoginService {
         });
         if (users) {
             // console.log("user exist", users.id);
-          this.userService.updateStatus(users.id, UserStatus.ONLINE);
+        
             const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }
@@ -44,7 +44,7 @@ export class LoginService {
                     isTwoFactorAuthenticationEnabled: false
                 },
               });
-              this.userService.updateStatus(users.id, UserStatus.ONLINE);
+          
               const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
               request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
       }

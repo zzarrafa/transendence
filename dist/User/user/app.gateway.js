@@ -9,25 +9,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppGateway = void 0;
+exports.UserGateway = void 0;
 const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const user_service_1 = require("./user.service");
-let AppGateway = class AppGateway {
+let UserGateway = class UserGateway {
     constructor(usersService) {
         this.usersService = usersService;
         this.logger = new common_1.Logger('login Gateway');
     }
-    handleConnection(client) {
-        this.logger.log(`Client connected: ${client.id}`);
-    }
-    handleDisconnect(client) {
-        this.logger.log(`Client disconnected: ${client.id}`);
-    }
 };
-AppGateway = __decorate([
+UserGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ namespace: 'login' }),
     __metadata("design:paramtypes", [user_service_1.UserService])
-], AppGateway);
-exports.AppGateway = AppGateway;
+], UserGateway);
+exports.UserGateway = UserGateway;
 //# sourceMappingURL=app.gateway.js.map

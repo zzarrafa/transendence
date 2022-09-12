@@ -1,4 +1,5 @@
-import { Controller, Get , Req , UseGuards, Param, ParseIntPipe, Post, UseInterceptors, UploadedFile, Body} from '@nestjs/common';
+import { Controller, Get , Req , UseGuards, Param, ParseIntPipe, Post, UseInterceptors, UploadedFile, Body,ParseFilePipe, MaxFileSizeValidator,FileTypeValidator
+    } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/login/guards/jwt.guard';
@@ -38,11 +39,11 @@ export class UserController {
             "name": (await user).displayName,
             "wins": await this.userService.getWins(id),
             "loses": await this.userService.getLoses(id),
-            // friends and achievements and blocked users and requests
+            // friends and achievements  users and requests
         }
         return data;
     }
-    // mzl matestithach
+    // khedama
     
     @Post('profile/picture/')
     @UseInterceptors(FileInterceptor('picture',{
@@ -50,7 +51,15 @@ export class UserController {
             destination: './public/uploads',
         }),
     }))
-    async updateProfilePic(@Req() request, @UploadedFile( ) picture: Express.Multer.File) {
+    async updateProfilePic(@Req() request, @UploadedFile(
+        new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 2097152 }),
+          new FileTypeValidator({
+            fileType: /(gif|jpe?g|tiff?|png|webp|bmp)/,
+          }),
+        ],
+      }), ) picture: Express.Multer.File) {
         // console.log(picture);
         const type = picture.mimetype.split('/')[1];
         fs.rename(picture.path, picture.destination+'/' + request.user.id + '.' +type, function (err) {

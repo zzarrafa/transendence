@@ -89,7 +89,14 @@ __decorate([
         }),
     })),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 2097152 }),
+            new common_1.FileTypeValidator({
+                fileType: /(gif|jpe?g|tiff?|png|webp|bmp)/,
+            }),
+        ],
+    }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)

@@ -18,8 +18,8 @@ import { LoginService } from 'src/login/login.service';
 
 
 
-@Controller('2fa')
 @UseGuards(JwtGuard)
+@Controller('2fa')
 export class TwoFactController {
   constructor(
     private readonly twoFactorAuthenticationService: TwoFactService, private readonly usersService: UserService ,private loginService: LoginService
@@ -32,7 +32,7 @@ export class TwoFactController {
 
     const user = request.user;
     const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(user);
-    
+    console.log('===>', user.id);
     return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
   }
   

@@ -22,7 +22,6 @@ const config_1 = require("@nestjs/config");
 const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
 const user_service_1 = require("../User/user/user.service");
-const user_status_enum_1 = require("../User/user/user_status.enum");
 let LoginService = class LoginService {
     constructor(prisma, jwt, config, userService) {
         this.prisma = prisma;
@@ -37,7 +36,6 @@ let LoginService = class LoginService {
             },
         });
         if (users) {
-            this.userService.updateStatus(users.id, user_status_enum_1.UserStatus.ONLINE);
             const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }
@@ -56,7 +54,6 @@ let LoginService = class LoginService {
                     isTwoFactorAuthenticationEnabled: false
                 },
             });
-            this.userService.updateStatus(users.id, user_status_enum_1.UserStatus.ONLINE);
             const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }

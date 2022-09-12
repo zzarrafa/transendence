@@ -6,8 +6,6 @@
             <div>
                 <form id="my-form">
                     <input type="file" id="picture">
-                    <input type="name" id="name">
-                    <input type="password" id="password">
                     <button type="submit">go</button>
                 </form>
             </div>
@@ -16,8 +14,6 @@
                     e.preventDefault();
                     const data = new FormData();
                     data.append('picture', document.getElementById('picture').files[0]);
-                    data.append('name', document.getElementById('name').value);
-                    data.append('password', document.getElementById('password').value);
                     fetch('/profilee/picture/', {
                         method: 'POST',
                         body: data

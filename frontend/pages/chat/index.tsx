@@ -43,7 +43,9 @@ function Chat() {
   const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
   const [checked, setChecked] = useState(true);
   const [password, setPassword] = useState("");
-  const [roomPassword, setRoomPassword] = useState("")
+  const [roomPassword, setRoomPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSettings, setShowSettings] = useState<{ [key: number]: boolean }>({});
 
 
   useEffect(()=> {
@@ -62,7 +64,7 @@ function Chat() {
       })
       setUserRooms(nonDmRooms)
       const dmRooms = rooms.filter((room) => {
-          return room.type == "DM"
+          return room.type === "DM"
       })
       setDmRooms(dmRooms);
       });
@@ -131,18 +133,16 @@ function Chat() {
   };
 
   const JoinRoom = (room: IRoom) => {
-    if (room.password) {
-      if (room.password === roomPassword) {
-        socket!.emit("joinRoom", room.id);
-        setRoomPassword("");
-      }
-      else {
-        alert("wrong password");
-      }
-    } else {
-      socket!.emit("joinRoom", room.id);
+    setSelectedRoom(room);
+    if (room.password && !showPassword) {
+      setShowPassword(true)
+    } else if (room.password == roomPassword || !room.password) {
+      socket?.emit("joinRoom", room.id);
+      setShowPassword(false)
     }
-
+    else {
+      alert("wrong password")
+    }
   };
 
   const LeaveRoom = (roomId: number) => {
@@ -189,6 +189,12 @@ function Chat() {
     getMessagesForRoom(room.id).then((data) => {
       setMessages({ ...messages, [room.id]: data });
     });
+    setShowSettings((showSettings) => {
+      return {
+        ...showSettings,
+        [room.id]: false,
+      };
+    });
   };
 
   const formatTime = (time: string) => {
@@ -208,6 +214,28 @@ function Chat() {
 
   const handleChangePassword = (e: any) => {
     setPassword(e.target.value);
+  }
+
+  const [selectedMember, setSelectedMember] = useState<IUser>()
+
+  const handleClickMember = (member: IUser) => {
+    setSelectedMember(member)
+    setShowSettings((showSettings) => {
+      return {
+        ...showSettings,
+        [member?.id]: !showSettings[member?.id],
+      };
+    });
+    }
+  const banUser = () => {
+    console.log("selectedMember", selectedMember)
+  }
+  const muteUser = () => {
+    console.log("selectedMember", selectedMember)
+  }
+
+  const setAdmin = () => {
+    console.log("selectedMember", selectedMember)
   }
 
   return (
@@ -267,7 +295,6 @@ function Chat() {
           <FormControlLabel control={
             <Checkbox checked={checked}  onChange={handleChangeCheckBox} inputProps={{ 'aria-label': 'controlled' }}/>} label="Private" />
         </FormGroup>
-          {/* input fieled for password */}
           <TextField
             id="password"
             label="Password"
@@ -291,36 +318,23 @@ function Chat() {
                     >
                       {room.name}
                     </Button>
-                    {
-                        room.password ? (
-                          <div>
-                            <TextField
-                              id="password"
-                              label="Password"
-                              value={roomPassword}
-                              onChange={(e:any) => setRoomPassword(e.target.value)}
-                              style={{ marginBottom: "5px" }}
-                            />
-                            <Button
-                              variant="contained"
-                              onClick={() => JoinRoom(room)}
-                            >
-                              Join
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            variant="contained"
-                            onClick={() => JoinRoom(room)}
-                          >
-                            Join
-                          </Button>
-                        )
-                    }
-
+                    <Button variant="contained" onClick={() => JoinRoom(room)}>Join</Button>
                 </Box>
               );
             })
+          }
+        </div>
+        <div>
+          {
+              showPassword && selectedRoom && (
+                <form style={{marginTop: "10px"}}>
+                  <TextField id="password" label="Password" value={roomPassword} onChange={(e:any) => setRoomPassword(e.target.value)} />
+                  <Box sx={{display: "flex", gap: "5px", marginTop: "10px"}}>
+                    <Button variant="contained" onClick={() => JoinRoom(selectedRoom)}>Join</Button>
+                    <Button variant="contained" onClick={() => setShowPassword(false)}>Cancel</Button>
+                  </Box>
+                </form>
+              )
           }
         </div>
       </Box>
@@ -391,12 +405,21 @@ function Chat() {
               {members[selectedRoom.id] &&
                 members[selectedRoom.id].map((member: IUser, index) => {
                   return (
-                    <li key={index}>
+                    <li key={index} onClick={()=> handleClickMember(member)}>
                       <b>{member.username}</b>
                     </li>
                   );
                 })}
             </ul>
+            {
+               selectedMember && showSettings[selectedMember.id] && (
+                <Box sx={{}}>
+                  <Button variant="outlined" onClick={banUser}>Ban</Button>
+                  <Button variant="outlined" onClick={muteUser}>Mute</Button>
+                  <Button variant="outlined" onClick={setAdmin}>Set Admin</Button>
+                </Box>
+               )
+            }
           </Box>
         </Box>
       }

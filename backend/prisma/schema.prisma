@@ -15,6 +15,7 @@ model User {
   id       Int    @id @default(autoincrement())
   name     String
   username String @unique
+  role     Int    @default(0)
   rooms    Room[] @relation("UserRoom")
   messages Message[]
 }

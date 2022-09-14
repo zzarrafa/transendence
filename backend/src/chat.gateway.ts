@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayInit {
       this.server.to(client.id).emit('rooms', rooms);
     });
     this.roomService.getAllRooms().then((rooms) => {
-      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
+      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && !r.isPrivate && r.type !== "DM");
       this.server.to(client.id).emit('allRooms', rooms);
     }
     );
@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && !r.isPrivate && r.type !== "DM");
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );
@@ -94,34 +94,30 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && !r.isPrivate && r.type !== "DM");
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );
     });
   }
 
-  // create a new room
   @SubscribeMessage("createRoom")
   handleRoomCreate(client: Socket, payload: { room: CreateRoomDto; creatorId: number }) {
     let userId: number;
+    let userRooms: any;
+    let allRooms: any;
     
-    this.roomService.createRoom(payload.room, payload.creatorId).then((room) => {
-      this.logger.log("client with id: " + client.id + ", create " + room.name);
+    this.roomService.createRoom(payload.room, payload.creatorId).then(async (room) => {
+
       for(let x of this.connections)
       {
         userId = JSON.parse(x.handshake.query.user as string).id;
-        if(room.users.find((u) => u.id === userId)) {
-          this.roomService.getRoomsForUser(userId).then((rooms) => {
-            this.server.to(x.id).emit('rooms', rooms);
-            this.server.to(x.id).emit('createdRoom', room);
-          });
-        }
-        this.roomService.getAllRooms().then((rooms) => {
-          // substract rooms that user is already in (public + protected)
-          rooms = rooms.filter((r) => !r.users.find((u) => u.id === userId) && r.type !== "DM")
-          this.server.to(x.id).emit('allRooms', rooms);
-        });
+        userRooms = await this.roomService.getRoomsForUser(userId);
+        allRooms = await this.roomService.getAllRooms();
+        allRooms = allRooms.filter((r) => !r.users.find((u) => u.id === userId) && !r.isPrivate && r.type !== "DM");
+        this.server.to(x.id).emit('rooms', userRooms);
+        this.server.to(x.id).emit('allRooms', allRooms);
+        this.server.to(x.id).emit('createdRoom', room);
       }
   });
   }

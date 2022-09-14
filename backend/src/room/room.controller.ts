@@ -40,8 +40,9 @@ export class RoomController {
     deleteAllRooms() {
         return this.roomService.deleteAllRooms();
     }
-    // @Post('join')
-    // joinRoom(@Body('roomId') roomId: any, @Body('userId') userId: any) {
-    //     return this.roomService.joinRoom(roomId, userId);
-    // }
+
+    @Get('/:roomId/members')
+    getMembers(@Param('roomId') roomId: number) {
+        return this.roomService.getMembers(roomId);
+    }
 }

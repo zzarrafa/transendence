@@ -26,9 +26,18 @@ async function getRoomById(roomId: number) {
     return data;
 }
 
+// get members of a room
+async function getMembers(roomId: number) {
+    const response = await fetch(`${apiUrl}room/${roomId}/members`);
+    const data = await response.json();
+    console.log(data);
+    return data;
+}
+
 
 export {
     getRoomsForUser,
     createRoom,
-    getRoomById
+    getRoomById,
+    getMembers
 }

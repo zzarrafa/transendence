@@ -31,8 +31,7 @@ export class ChatGateway implements OnGatewayInit {
       this.server.to(client.id).emit('rooms', rooms);
     });
     this.roomService.getAllRooms().then((rooms) => {
-      // substract rooms that user is already in (public + protected) && not DM
-      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM");
+      rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
       this.server.to(client.id).emit('allRooms', rooms);
     }
     );
@@ -80,7 +79,7 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM");
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );
@@ -95,7 +94,7 @@ export class ChatGateway implements OnGatewayInit {
         this.server.to(client.id).emit('rooms', rooms);
       });
       this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM")
+        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && r.type !== "DM" && !r.isPrivate);
         this.server.to(client.id).emit('allRooms', rooms);
       }
       );

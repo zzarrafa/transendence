@@ -7,8 +7,10 @@ import { io, Socket } from "socket.io-client";
 import { getAllUsers, getUserByUsername } from "../../services/user";
 import { IRoom, IUser, IMessage } from "../../commun/types";
 import { getMessagesForRoom } from "../../services/message";
+import { getMembers, getRoomById } from "../../services/room";
 import moment from "moment";
 import Search from "../../commun/search";
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -24,6 +26,7 @@ const MenuProps = {
 
 function Chat() {
   const [messages, setMessages] = useState<{ [key: number]: IMessage[] }>({});
+  const [members, setMembers] = useState<{ [key: number]:IUser[]}>({});
   const [showForm, setShowForm] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [message, setMessage] = useState("");
@@ -39,7 +42,8 @@ function Chat() {
   const [showRoomContent, setShowRoomContent] = useState(false);
   const [dmRooms, setDmRooms] = useState<IRoom[]>([]);
   const [checked, setChecked] = useState(true);
-  const [password, setPassword] = useState("")
+  const [password, setPassword] = useState("");
+  const [roomPassword, setRoomPassword] = useState("")
 
 
   useEffect(()=> {
@@ -126,8 +130,19 @@ function Chat() {
     setShowForm(!showForm);
   };
 
-  const JoinRoom = (roomId: number) => {
-    socket!.emit("joinRoom", roomId);
+  const JoinRoom = (room: IRoom) => {
+    if (room.password) {
+      if (room.password === roomPassword) {
+        socket!.emit("joinRoom", room.id);
+        setRoomPassword("");
+      }
+      else {
+        alert("wrong password");
+      }
+    } else {
+      socket!.emit("joinRoom", room.id);
+    }
+
   };
 
   const LeaveRoom = (roomId: number) => {
@@ -163,6 +178,14 @@ function Chat() {
   const handleClickRoom = (room: IRoom) => {
     setSelectedRoom(room);
     setShowRoomContent(true);
+    getMembers(room.id).then((data) => {
+      setMembers((members) => {
+        return {
+          ...members,
+          [room.id]: data.users,
+          };
+      });
+    });
     getMessagesForRoom(room.id).then((data) => {
       setMessages({ ...messages, [room.id]: data });
     });
@@ -268,7 +291,33 @@ function Chat() {
                     >
                       {room.name}
                     </Button>
-                    <Button variant="outlined" onClick={()=> JoinRoom(room.id)}> Join </Button>
+                    {
+                        room.password ? (
+                          <div>
+                            <TextField
+                              id="password"
+                              label="Password"
+                              value={roomPassword}
+                              onChange={(e:any) => setRoomPassword(e.target.value)}
+                              style={{ marginBottom: "5px" }}
+                            />
+                            <Button
+                              variant="contained"
+                              onClick={() => JoinRoom(room)}
+                            >
+                              Join
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={() => JoinRoom(room)}
+                          >
+                            Join
+                          </Button>
+                        )
+                    }
+
                 </Box>
               );
             })
@@ -301,39 +350,53 @@ function Chat() {
         selectedRoom &&
         <Box sx={{
           display: showRoomContent ? "flex" : "none",
-          flexDirection: "column",
-          alignItems: "center",
+          justifyContent: "space-between",
           border: "1px solid gray",
           padding: "10px",
           margin: "10px",
-          width: "50%",
+          width: "60%",
           }}>
+            <Box >
+              <Box>
+                <Button variant="outlined" onClick={()=> LeaveRoom(selectedRoom.id)} > Leave </Button>
+                <ul id='messages'>
+                  
+                  {messages[selectedRoom.id] &&
+                    messages[selectedRoom.id].map((msg: IMessage, index) => {
+                      return (
+                        <li key={index}>
+                          <b>{msg.user.username}</b> : {msg.content} <span>{formatTime(msg.createdAt.toString())}</span>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </Box>
+              <Box>
+                <form onSubmit={(e) => createMessage(e)}>
+                  <TextField
+                    placeholder='Type a message...'
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    style={{ marginRight: "5px" }}
+                  />
+                  <Button type='submit' variant="contained">
+                    Send
+                  </Button>
+                </form>
+              </Box>
+            </Box>
           <Box>
-            <Button variant="outlined" onClick={()=> LeaveRoom(selectedRoom.id)} > Leave </Button>
-            <ul id='messages'>
-              
-              {messages[selectedRoom.id] &&
-                messages[selectedRoom.id].map((msg: IMessage, index) => {
+            <h3>Members</h3>
+            <ul>
+              {members[selectedRoom.id] &&
+                members[selectedRoom.id].map((member: IUser, index) => {
                   return (
                     <li key={index}>
-                      <b>{msg.user.username}</b> : {msg.content} <span>{formatTime(msg.createdAt.toString())}</span>
+                      <b>{member.username}</b>
                     </li>
                   );
                 })}
             </ul>
-          </Box>
-          <Box>
-            <form onSubmit={(e) => createMessage(e)}>
-              <TextField
-                placeholder='Type a message...'
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                style={{ marginRight: "5px" }}
-              />
-              <Button type='submit' variant="contained">
-                Send
-              </Button>
-            </form>
           </Box>
         </Box>
       }

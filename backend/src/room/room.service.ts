@@ -88,11 +88,10 @@ export class RoomService {
         return this.prisma.room.deleteMany({});
     }
 
-    // room members
-    async getRoomMembers(roomId: number) {
+    async getMembers(roomId: any) {
         return this.prisma.room.findUnique({
             where: {
-                id: roomId,
+                id: parseInt(roomId),
             },
             include: {
                 users: true,

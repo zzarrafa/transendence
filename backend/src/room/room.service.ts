@@ -88,18 +88,16 @@ export class RoomService {
         return this.prisma.room.deleteMany({});
     }
 
-    // async joinRoom(roomId: any, userId: any) {
-    //     return this.prisma.room.update({
-    //         where: {
-    //             id: parseInt(roomId),
-    //         },
-    //         data: {
-    //             users: {
-    //                 connect: {
-    //                     id: parseInt(userId),
-    //                 },
-    //             },
-    //         },
-    //     });
-    // }
+    // room members
+    async getRoomMembers(roomId: number) {
+        return this.prisma.room.findUnique({
+            where: {
+                id: roomId,
+            },
+            include: {
+                users: true,
+            },
+        })
+    }
+        
 }

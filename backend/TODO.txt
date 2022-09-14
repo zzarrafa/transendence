@@ -8,13 +8,13 @@ TODO:
 
 
 
-- DM message (search user and send him msg (not a blocked user (A FAIRE))): DONE
 - Private Room
 - protected Room by password
-- block user (he can see new messages)
+- DM message (search user and send him msg (not a blocked user (A FAIRE))): DONE
+- block user (he can see new messages) (DM OR GROUP)
+- ban : nkhrjo mn group o my3wd ydir join hta yssali lwa9t (kyna f room)
+- mute: he can't send msg UNTIL end time ((kyna f room))
 - add role to user (channel owner->administartor: add password to channel, modify it or remove it, set user to administartor;
                     administrator: ban or mute user for a limited time
                     )
 - admin: 2, owner: 1, member: 0, 
-- ban : nkhrjo mn group o my3wd ydir join hta yssali lwa9t
-- mute: he can't send msg UNTIL end time

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, TextField, OutlinedInput,InputLabel, MenuItem, FormControl, Checkbox, FormGroup, FormControlLabel} from "@mui/material";
+import { Button, TextField, OutlinedInput,InputLabel, MenuItem, FormControl, Checkbox, FormGroup, FormControlLabel, Typography} from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Box } from "@mui/system";
 import React from "react";
@@ -81,6 +81,17 @@ function Chat() {
             };
           });
       });
+
+      socket.on("members", (data) => {
+        console.log("MEMBERS", data)
+        setMembers((members) => {
+          return {
+            ...members,
+            [data.roomId]: data.members,
+          };
+        });
+      });
+
     }
   }, [socket]);
 
@@ -133,7 +144,7 @@ function Chat() {
   };
 
   const JoinRoom = (room: IRoom) => {
-    setSelectedRoom(room);
+    // setSelectedRoom(room);
     if (room.password && !showPassword) {
       setShowPassword(true)
     } else if (room.password == roomPassword || !room.password) {
@@ -178,7 +189,17 @@ function Chat() {
   const handleClickRoom = (room: IRoom) => {
     setSelectedRoom(room);
     setShowRoomContent(true);
+
     getMembers(room.id).then((data) => {
+      data.users.map((member: IUser) => {
+        setShowSettings((showSettings) => {
+          return {
+            ...showSettings,
+            [member?.id]: false,
+          };
+        });
+      });
+
       setMembers((members) => {
         return {
           ...members,
@@ -186,14 +207,9 @@ function Chat() {
           };
       });
     });
+
     getMessagesForRoom(room.id).then((data) => {
       setMessages({ ...messages, [room.id]: data });
-    });
-    setShowSettings((showSettings) => {
-      return {
-        ...showSettings,
-        [room.id]: false,
-      };
     });
   };
 
@@ -223,17 +239,36 @@ function Chat() {
     setShowSettings((showSettings) => {
       return {
         ...showSettings,
-        [member?.id]: !showSettings[member?.id],
+        [member?.id]: true,
       };
     });
     }
+  const [toggleBanTime, setToggleBanTime] = useState(false);
+  const [toggleMuteTime, setToggleMuteTime] = useState(false);
+  const [banTime, setBanTime] = useState(0);
+  const [muteTime, setMuteTime] = useState(0);
+
+  // ban user (he can not join room until a limited time)
   const banUser = () => {
-    console.log("selectedMember", selectedMember)
+    setToggleBanTime(true)
+    if (selectedMember) {
+      socket!.emit("banUser", {roomId: selectedRoom?.id, userId: selectedMember.id, time: banTime})
+    }
   }
+  // mute user (he can not see messages until a limited time)
   const muteUser = () => {
     console.log("selectedMember", selectedMember)
+    setToggleMuteTime(true)
+    if (selectedMember) {
+      socket!.emit("muteUser", {roomId: selectedRoom?.id, userId: selectedMember.id, time: muteTime})
+    }
   }
 
+  const timeOptions = [
+    { value: 1, label: '1 minute' },
+    { value: 5, label: '5 minutes' },
+    { value: 10, label: '10 minutes' },
+  ];
   const setAdmin = () => {
     console.log("selectedMember", selectedMember)
   }
@@ -328,7 +363,8 @@ function Chat() {
           {
               showPassword && selectedRoom && (
                 <form style={{marginTop: "10px"}}>
-                  <TextField id="password" label="Password" value={roomPassword} onChange={(e:any) => setRoomPassword(e.target.value)} />
+                  <TextField id="password" label="Password" value={roomPassword}
+                    onChange={(e:any) => setRoomPassword(e.target.value)} />
                   <Box sx={{display: "flex", gap: "5px", marginTop: "10px"}}>
                     <Button variant="contained" onClick={() => JoinRoom(selectedRoom)}>Join</Button>
                     <Button variant="contained" onClick={() => setShowPassword(false)}>Cancel</Button>
@@ -405,7 +441,8 @@ function Chat() {
               {members[selectedRoom.id] &&
                 members[selectedRoom.id].map((member: IUser, index) => {
                   return (
-                    <li key={index} onClick={()=> handleClickMember(member)}>
+                    <li key={index} onClick={()=> handleClickMember(member)} 
+                      style={{border: (selectedMember && selectedMember.username === member.username) ? "1px solid red" : "1px solid"}}>
                       <b>{member.username}</b>
                     </li>
                   );
@@ -413,10 +450,40 @@ function Chat() {
             </ul>
             {
                selectedMember && showSettings[selectedMember.id] && (
-                <Box sx={{}}>
-                  <Button variant="outlined" onClick={banUser}>Ban</Button>
-                  <Button variant="outlined" onClick={muteUser}>Mute</Button>
-                  <Button variant="outlined" onClick={setAdmin}>Set Admin</Button>
+                <Box>
+                  <Box sx={{}}>
+                    <Typography variant="h5"> {selectedMember.username} </Typography>
+                    <Button variant="outlined" onClick={banUser}>Ban</Button>
+                    <Button variant="outlined" onClick={muteUser}>Mute</Button>
+                    <Button variant="outlined" onClick={setAdmin}>Set Admin</Button>
+                  </Box>
+
+                  {
+                    toggleBanTime && (
+                      <Select value={banTime} onChange={(e)=> setBanTime(Number(e.target.value))}>
+                      {
+                        timeOptions.map((timeOption: any) => {
+                          return (
+                            <MenuItem value={timeOption.value}>{timeOption.label}</MenuItem>
+                          );
+                        })
+                      }
+                    </Select>
+                    )
+                  }
+                  {
+                    toggleMuteTime && (
+                      <Select value={muteTime} onChange={(e)=> setMuteTime(Number(e.target.value))}>
+                      {
+                        timeOptions.map((timeOption: any) => {
+                          return (
+                            <MenuItem value={timeOption.value}>{timeOption.label}</MenuItem>
+                          );
+                        })
+                      }
+                    </Select>
+                    )
+                  }
                 </Box>
                )
             }

@@ -74,19 +74,27 @@ export class ChatGateway implements OnGatewayInit {
   
   @SubscribeMessage("joinRoom")
   handleRoomJoin(client: Socket, roomId: number) {
-    this.roomService.joinRoom(roomId, this.currentUser.id).then(() => {
-      this.roomService.getRoomsForUser(this.currentUser.id).then((rooms) => {
-        this.server.to(client.id).emit('rooms', rooms);
-      });
-      this.roomService.getAllRooms().then((rooms) => {
-        rooms = rooms.filter((r) => !r.users.find((u) => u.id === this.currentUser.id) && !r.isPrivate && r.type !== "DM");
-        this.server.to(client.id).emit('allRooms', rooms);
+    let userId: number;
+    let members: any;
+    let userRooms: any;
+    let allRooms: any;
+    this.roomService.joinRoom(roomId, this.currentUser.id).then(async () => {
+      userRooms = await this.roomService.getRoomsForUser(this.currentUser.id);
+      this.server.to(client.id).emit('rooms', userRooms);
+      for(let x of this.connections)
+      {
+        userId = JSON.parse(x.handshake.query.user as string).id;
+        members = await (await this.roomService.getMembers(roomId)).users;
+        allRooms = await this.roomService.getAllRooms();
+        allRooms = allRooms.filter((r) => !r.users.find((u) => u.id === userId) && !r.isPrivate && r.type !== "DM");
+        this.server.to(x.id).emit('allRooms', allRooms);
+        this.server.to(x.id).emit('members', {members: members, roomId: roomId});
+        this.server.to(x.id).emit('joinedRoom', roomId);
       }
-      );
     });
   }
 
-
+  // a update !! 
   @SubscribeMessage("leaveRoom")
   handleRoomLeave(client: Socket, roomId: number) {
     this.roomService.leaveRoom(roomId, this.currentUser.id).then(() => {
@@ -121,4 +129,25 @@ export class ChatGateway implements OnGatewayInit {
       }
   });
   }
+
+  // ban user
+  // @SubscribeMessage("banUser")
+  // handleBanUser(client: Socket, payload: { userId: number; roomId: number }) {
+  //   this.roomService.banUser(payload.roomId, payload.userId).then(() => {
+  //     this.roomService.getMembers(payload.roomId).then((members) => {
+  //       this.server.to(client.id).emit('members', {members: members.users, roomId: payload.roomId});
+  //     });
+  //   });
+  // }
+
+  // // mute user
+  // @SubscribeMessage("muteUser")
+  // handleMuteUser(client: Socket, payload: { userId: number; roomId: number }) {
+  //   this.roomService.muteUser(payload.roomId, payload.userId).then(() => {
+  //     this.roomService.getMembers(payload.roomId).then((members) => {
+  //       this.server.to(client.id).emit('members', {members: members.users, roomId: payload.roomId});
+  //     });
+  //   });
+  // }
+  
 }

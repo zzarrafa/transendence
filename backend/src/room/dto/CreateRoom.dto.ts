@@ -5,7 +5,6 @@ export class CreateRoomDto {
     @IsString()
     @IsNotEmpty()
     name: string;
-    users: number[];
     @IsNotEmpty()
     type: string;
     @IsBoolean()

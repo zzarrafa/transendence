@@ -6,18 +6,19 @@ import { CreateRoomDto } from './dto/CreateRoom.dto';
 export class RoomService {
     constructor(private prisma: PrismaService) {}
     async createRoom(room: CreateRoomDto, creatorId: number) {
-        room.users.push(creatorId);
-        return this.prisma.room.create({
-            data: {
-                ...room,
-                users: {
-                    connect: room.users.map((id) => ({ id })),
-                }
-            },
-            include: {
-                users: true,
-            }
-        });
+        // room.users.push(creatorId);
+        // return this.prisma.room.create({
+        //     data: {
+        //         ...room,
+        //         users: {
+        //             connect: room.users.map((id) => ({ id })),
+        //         }
+        //     },
+        //     include: {
+        //         users: true,
+        //     }
+        // });
+
     }
 
     async getRoomsForUser(userId: any) {
@@ -98,5 +99,9 @@ export class RoomService {
             },
         })
     }
+
+    // mute user for a limited time
+    // async muteUser(roomId: number, userId: number, time: number) {
         
+    // }
 }

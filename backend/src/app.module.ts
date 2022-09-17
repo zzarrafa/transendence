@@ -9,11 +9,12 @@ import { RoomService } from './room/room.service';
 import { RoomController } from './room/room.controller';
 import { MessageService } from './message/message.service';
 import { MessageController } from './message/message.controller';
-import { UserRoomService } from './user-room/user-room.service';
+import { MembershipService } from './membership/membership.service';
+import { MembershipController } from './membership/membership.controller';
 
 @Module({
   imports: [PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
-  providers: [ChatGateway, UserService, RoomService, MessageService, UserRoomService],
-  controllers: [AppController, UserController, RoomController, MessageController],
+  providers: [ChatGateway, UserService, RoomService, MessageService, MembershipService],
+  controllers: [AppController, UserController, RoomController, MessageController, MembershipController],
 })
 export class AppModule {}

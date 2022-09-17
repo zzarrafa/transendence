@@ -7,7 +7,7 @@ import { io, Socket } from "socket.io-client";
 import { getAllUsers, getUserByUsername } from "../../services/user";
 import { IRoom, IUser, IMessage } from "../../commun/types";
 import { getMessagesForRoom } from "../../services/message";
-import { getMembers, getRoomById } from "../../services/room";
+import { getMembers, banUser } from "../../services/room";
 import moment from "moment";
 import Search from "../../commun/search";
 
@@ -243,24 +243,20 @@ function Chat() {
       };
     });
     }
-  const [toggleBanTime, setToggleBanTime] = useState(false);
   const [toggleMuteTime, setToggleMuteTime] = useState(false);
-  const [banTime, setBanTime] = useState(0);
   const [muteTime, setMuteTime] = useState(0);
 
-  // ban user (he can not join room until a limited time)
+  // ban user (for always)
   const banUser = () => {
-    setToggleBanTime(true)
     if (selectedMember) {
-      socket!.emit("banUser", {roomId: selectedRoom?.id, userId: selectedMember.id, time: banTime})
+      socket!.emit("banUser", {roomId: selectedRoom?.id, userId: selectedMember.id })
     }
   }
   // mute user (he can not see messages until a limited time)
   const muteUser = () => {
-    console.log("selectedMember", selectedMember)
     setToggleMuteTime(true)
     if (selectedMember) {
-      socket!.emit("muteUser", {roomId: selectedRoom?.id, userId: selectedMember.id, time: muteTime})
+      socket!.emit("muteUser", {roomId: selectedRoom?.id, userId: selectedMember.id, duration: muteTime})
     }
   }
 
@@ -457,20 +453,6 @@ function Chat() {
                     <Button variant="outlined" onClick={muteUser}>Mute</Button>
                     <Button variant="outlined" onClick={setAdmin}>Set Admin</Button>
                   </Box>
-
-                  {
-                    toggleBanTime && (
-                      <Select value={banTime} onChange={(e)=> setBanTime(Number(e.target.value))}>
-                      {
-                        timeOptions.map((timeOption: any) => {
-                          return (
-                            <MenuItem value={timeOption.value}>{timeOption.label}</MenuItem>
-                          );
-                        })
-                      }
-                    </Select>
-                    )
-                  }
                   {
                     toggleMuteTime && (
                       <Select value={muteTime} onChange={(e)=> setMuteTime(Number(e.target.value))}>

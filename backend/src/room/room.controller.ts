@@ -11,11 +11,6 @@ export class RoomController {
         return this.roomService.createRoom(room, creatorId);
     }
 
-    @Get('user/:userId')
-    getRoomsForUser(@Param('userId') userId) {
-        return this.roomService.getRoomsForUser(userId);
-    }
-
     @Get('all')
     getAllRooms() {
         return this.roomService.getAllRooms();
@@ -24,25 +19,5 @@ export class RoomController {
     @Get('/:roomId')
     getRoomById(@Param('roomId') roomId: number) {
         return this.roomService.getRoomById(roomId);
-    }
-
-    @Post('join')
-    joinRoom(@Body('roomId') roomId: number, @Body('userId') userId: number) {
-        return this.roomService.joinRoom(roomId, userId);
-    }
-    
-    @Post('leave')
-    leaveRoom(@Body('roomId') roomId: number, @Body('userId') userId: number) {
-        return this.roomService.leaveRoom(roomId, userId);
-    }
-
-    @Delete('/delete')
-    deleteAllRooms() {
-        return this.roomService.deleteAllRooms();
-    }
-
-    @Get('/:roomId/members')
-    getMembers(@Param('roomId') roomId: number) {
-        return this.roomService.getMembers(roomId);
     }
 }

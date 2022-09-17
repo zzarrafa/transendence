@@ -10,7 +10,7 @@ datasource db {
 // user can join many rooms and a room can have many users => many to many
 // user can create many messages and a message can be created by one user => one to many
 // message can be in one room and a room can have many messages => one to many
-// user can have role in a room (UserRoom model )
+// user can have role in a room (Membership model )
 // user can be muted in a room
 // user can be banned in a room
 
@@ -19,20 +19,20 @@ model User {
   name     String
   username String     @unique
   messages Message[]
-  rooms    UserRoom[]
+  rooms    Membership[]
 }
 
 model Room {
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  type      String
-  isPrivate Boolean
+  type      String // GROUP or DM
+  isPrivate Boolean // public/private/protected
   password  String?
-  users     UserRoom[]
+  users     Membership[]
   messages  Message[]
 }
 
-model UserRoom {
+model Membership {
   id       Int     @id @default(autoincrement())
   userId   Int
   roomId   Int

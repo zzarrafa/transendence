@@ -10,4 +10,5 @@ export class CreateRoomDto {
     @IsBoolean()
     isPrivate: boolean;
     password: string;
+    users: number[];
 }

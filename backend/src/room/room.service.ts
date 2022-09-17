@@ -1,39 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRoomDto } from './dto/CreateRoom.dto';
+import { MembershipService } from 'src/membership/membership.service';
+
 
 @Injectable()
 export class RoomService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService, private membershipService: MembershipService) {}
     async createRoom(room: CreateRoomDto, creatorId: number) {
-        // room.users.push(creatorId);
-        // return this.prisma.room.create({
-        //     data: {
-        //         ...room,
-        //         users: {
-        //             connect: room.users.map((id) => ({ id })),
-        //         }
-        //     },
-        //     include: {
-        //         users: true,
-        //     }
-        // });
-
-    }
-
-    async getRoomsForUser(userId: any) {
-        return this.prisma.room.findMany({
-            where: {
-                users: {
-                    some: {
-                        id: parseInt(userId),
-                    },
-                },
-            },
-            include: {
-                users: true,
-            },
+        const newRoom = await this.prisma.room.create({
+            data: {
+                name: room.name,
+                type: room.type,
+                isPrivate: room.isPrivate,
+                password: room.password
+            }
         });
+        await this.membershipService.createMembership(newRoom.id, creatorId);
+        await this.membershipService.updateRole(newRoom.id, creatorId, 2);
+        for (var userId of room.users)
+        {
+            await this.membershipService.createMembership(newRoom.id, userId);
+        }
     }
     
     async getAllRooms() {
@@ -55,53 +43,4 @@ export class RoomService {
         });
     }
 
-    async joinRoom(roomId: number, userId: number) {
-        return this.prisma.room.update({
-            where: {
-                id: roomId,
-            },
-            data: {
-                users: {
-                    connect: {
-                        id: userId,
-                    },
-                },
-            },
-        });
-    }
-
-    async leaveRoom(roomId: number, userId: number) {
-        return this.prisma.room.update({
-            where: {
-                id: roomId,
-            },
-            data: {
-                users: {
-                    disconnect: {
-                        id: userId,
-                    },
-                },
-            },
-        });
-    }
-
-    async deleteAllRooms() {
-        return this.prisma.room.deleteMany({});
-    }
-
-    async getMembers(roomId: any) {
-        return this.prisma.room.findUnique({
-            where: {
-                id: parseInt(roomId),
-            },
-            include: {
-                users: true,
-            },
-        })
-    }
-
-    // mute user for a limited time
-    // async muteUser(roomId: number, userId: number, time: number) {
-        
-    // }
 }

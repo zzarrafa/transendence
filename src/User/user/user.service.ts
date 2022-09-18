@@ -29,6 +29,19 @@ async getUserById(id: number) {
     }
     return user;
 }
+
+async GetUserByEmail(email: string)
+{
+    const user = await this.prisma.user.findUnique({
+        where: {
+            email,
+        },
+    });
+    if (!user) {
+        throw new NotFoundException('user not found');
+    }
+    return user;
+}
 async UpdateDisplayName(id: number, displayName: string) {
 
     const user = await this.prisma.user.findUnique({

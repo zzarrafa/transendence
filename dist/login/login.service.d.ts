@@ -10,6 +10,6 @@ export declare class LoginService {
     private config;
     private userService;
     constructor(prisma: PrismaService, jwt: JwtService, config: ConfigService, userService: UserService);
-    login(logDto: LogDto, userr: Profile, request: any): Promise<void>;
+    login(logDto: LogDto, userr: Profile, request: any, res: any): Promise<void>;
     getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated?: boolean): Promise<string>;
 }

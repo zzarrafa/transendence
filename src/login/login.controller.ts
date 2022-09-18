@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Redirect, UseGuards, Render, Req} from '@nestjs/common';
+import { Body, Controller, Get, Post, Redirect, UseGuards, Render, Req, Res} from '@nestjs/common';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { LogDto } from './dto';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
@@ -30,7 +30,6 @@ export class LoginController {
   
   @Get('logout')
   @UseGuards(JwtGuard)
-  // @Redirect('/')
   async logOut(@Req() request) {
     await logout();
     //clear cookie
@@ -42,7 +41,7 @@ export class LoginController {
   @Get('42/return')
   @UseGuards(FtOauthGuard)
   @Redirect('/')
-  login(@Body() dto: LogDto,@Userr() user: Profile, @Req() request) {
-    return this.loginService.login(dto,user,request);
+  login(@Body() dto: LogDto,@Userr() user: Profile, @Req() request, @Res() res) {
+    return this.loginService.login(dto,user,request, res);
     }
 }

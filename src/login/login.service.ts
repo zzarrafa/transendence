@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException , Req} from '@nestjs/common';
+import { Injectable, ForbiddenException , Req, Res} from '@nestjs/common';
 import { PrismaService } from "src/prisma/prisma.service";
 import { LogDto } from "./dto";
 import { JwtService } from "@nestjs/jwt";
@@ -16,7 +16,7 @@ import { UserStatus } from 'src/User/user/user_status.enum';
 export class LoginService {
     constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService , private userService : UserService) {}
 
-    async login(logDto: LogDto, @Userr() userr: Profile, @Req()request) {
+    async login(logDto: LogDto, @Userr() userr: Profile, @Req()request, @Res() res) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -25,8 +25,19 @@ export class LoginService {
         if (users) {
             // console.log("user exist", users.id);
         
+            if (users.isTwoFactorAuthenticationEnabled)
+            {
+              res.redirect("http://localhost:3000/2fa/code");
+            }
+            else
+            {
+              
+              console.log('here');
             const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+            }
+            // const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
+            // request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
         }
         else {
           // console.log("not here!");

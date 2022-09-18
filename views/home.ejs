@@ -4,7 +4,7 @@
         <% } else { %>
             <p>Hello, <%= user.displayName %> .</p>
             <div>
-                <form id="my-form">
+                <form id="my-form" >
                     <input type="file" id="picture">
                     <button type="submit">go</button>
                 </form>
@@ -14,7 +14,7 @@
                     e.preventDefault();
                     const data = new FormData();
                     data.append('picture', document.getElementById('picture').files[0]);
-                    fetch('/profilee/picture/', {
+                    fetch('/profile/picture/', {
                         method: 'POST',
                         body: data
                     })

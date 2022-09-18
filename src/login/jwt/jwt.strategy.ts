@@ -6,11 +6,12 @@ import {ConfigService} from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy,) {
+export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(config: ConfigService,private prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request) => {
         let data = request?.headers.cookie;
+
         if (data.includes(';')) 
         {
           data = data.split(';').find(c => c.trim().startsWith('Authentication='));

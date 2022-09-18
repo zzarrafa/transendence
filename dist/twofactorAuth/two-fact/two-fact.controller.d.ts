@@ -1,7 +1,10 @@
 import { TwoFactService } from './two-fact.service';
 import { Response } from 'express';
+import { User } from '@prisma/client';
 import { UserService } from 'src/User/user/user.service';
 import { LoginService } from 'src/login/login.service';
+import { Profile } from 'passport-42';
+import { TwoFactorAuthenticationCodeDto } from 'src/login/dto';
 export declare class TwoFactController {
     private readonly twoFactorAuthenticationService;
     private readonly usersService;
@@ -9,5 +12,6 @@ export declare class TwoFactController {
     constructor(twoFactorAuthenticationService: TwoFactService, usersService: UserService, loginService: LoginService);
     register(response: Response, request: any): Promise<any>;
     turnOnTwoFactorAuthentication(request: any, twoFactorAuthenticationCode: any): Promise<void>;
-    authenticate(request: any, twoFactorAuthenticationCode: any): Promise<any>;
+    fun(): void;
+    authenticate(user: Profile, code: TwoFactorAuthenticationCodeDto, request: any): Promise<User>;
 }

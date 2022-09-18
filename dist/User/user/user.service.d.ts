@@ -11,6 +11,7 @@ export declare class UserService {
         email: string;
     }[]>;
     getUserById(id: number): Promise<User>;
+    GetUserByEmail(email: string): Promise<User>;
     UpdateDisplayName(id: number, displayName: string): Promise<User>;
     getWins(id: number): Promise<number>;
     getLoses(id: number): Promise<number>;

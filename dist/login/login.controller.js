@@ -36,8 +36,8 @@ let LoginController = class LoginController {
         request.res.clearCookie('Authentication');
         console.log("logout");
     }
-    login(dto, user, request) {
-        return this.loginService.login(dto, user, request);
+    login(dto, user, request, res) {
+        return this.loginService.login(dto, user, request, res);
     }
 };
 __decorate([
@@ -62,8 +62,9 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, user_decorator_1.Userr)()),
     __param(2, (0, common_1.Req)()),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object]),
+    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
     __metadata("design:returntype", void 0)
 ], LoginController.prototype, "login", null);
 LoginController = __decorate([

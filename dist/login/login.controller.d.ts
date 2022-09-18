@@ -8,5 +8,5 @@ export declare class LoginController {
     constructor(loginService: LoginService, userService: UserService);
     ftAuth(): void;
     logOut(request: any): Promise<void>;
-    login(dto: LogDto, user: Profile, request: any): Promise<void>;
+    login(dto: LogDto, user: Profile, request: any, res: any): Promise<void>;
 }

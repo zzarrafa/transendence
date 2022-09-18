@@ -1,16 +1,40 @@
-
 <%- include('./header.ejs') %>
-<form id="register" method="post" action="/user/register">    
-    <label><b>displayName   
-    </b>    
-    </label>    
-    <input type="text" name="name" id="email" placeholder="displayName">    
-    <br><br>    
-    <label><b>Pic     
-    </b>    
-    </label>    
-    <input type="image" name="pic" id="pic" placeholder="image">    
-    <br><br>    
-    <input type="submit" name="button" id="submit" value="Register">
-</form> 
-<%- include('./footer.ejs') %>
+
+
+    <div>
+        <form id="my-form">
+            <input type="text" id="code">
+            <button type="submit">go</button>
+
+        </form>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        async function hundleSubmit(e) {
+            e.preventDefault();
+            const code = document.getElementById('code').value;
+            console.log('code node***************', code);
+            await axios.post('http://localhost:3000/2fa/signup', {
+                code
+            }).then((data) => console.log(data))
+            .catch((error)=>console.log(error))
+            // fetch('/2fa/signup', {
+            //     method: 'POST',
+            //     body: JSON.stringify({
+            //         code: code
+            //     })
+            // })
+        }
+        var form = document.getElementById('my-form');
+        console.log('------');
+        if (form.attachEvent) {
+            console.log('------1');
+            form.attachEvent("submit", hundleSubmit);
+        } else {
+            console.log('------2');
+            form.addEventListener("submit", hundleSubmit);
+        }
+    </script>
+    <%- include('./footer.ejs') %>

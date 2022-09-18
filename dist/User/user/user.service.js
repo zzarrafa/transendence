@@ -38,6 +38,17 @@ let UserService = class UserService {
         }
         return user;
     }
+    async GetUserByEmail(email) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
+        }
+        return user;
+    }
     async UpdateDisplayName(id, displayName) {
         const user = await this.prisma.user.findUnique({
             where: {

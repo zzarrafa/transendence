@@ -7,7 +7,7 @@ import { io, Socket } from "socket.io-client";
 import { getAllUsers, getUserByUsername } from "../../services/user";
 import { IRoom, IUser, IMessage } from "../../commun/types";
 import { getMessagesForRoom } from "../../services/message";
-import { getMembers, banUser } from "../../services/room";
+import { getMembers, banUser, isMuted } from "../../services/room";
 import moment from "moment";
 import Search from "../../commun/search";
 
@@ -22,6 +22,12 @@ const MenuProps = {
     },
   },
 };
+
+const timeOptions = [
+  { value: 1, label: '1 minute' },
+  { value: 5, label: '5 minutes' },
+  { value: 10, label: '10 minutes' },
+];
 
 
 function Chat() {
@@ -46,6 +52,9 @@ function Chat() {
   const [roomPassword, setRoomPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showSettings, setShowSettings] = useState<{ [key: number]: boolean }>({});
+  const [toggleMuteButton, setToggleMuteButton] = useState(false);
+  const [muteTime, setMuteTime] = useState<number>(1);
+  const [muted, setMuted] = useState("Mute")
 
 
   useEffect(()=> {
@@ -90,6 +99,18 @@ function Chat() {
             [data.roomId]: data.members,
           };
         });
+      });
+
+      socket.on("unmuteUser", (membership) => {
+        socket.emit("unmuteUser", {roomId: membership.roomId, userId: membership.userId})
+        getMessagesForRoom(membership.roomId).then((data) => {
+          setMessages({ ...messages, [membership.roomId]: data });
+        });
+        setMuted("Mute")
+      });
+
+      socket.on("error", (error) => {
+        alert(error)
       });
 
     }
@@ -191,7 +212,8 @@ function Chat() {
     setShowRoomContent(true);
 
     getMembers(room.id).then((data) => {
-      data.users.map((member: IUser) => {
+      console.log("data:", data);
+      data.map((member: IUser) => {
         setShowSettings((showSettings) => {
           return {
             ...showSettings,
@@ -203,14 +225,18 @@ function Chat() {
       setMembers((members) => {
         return {
           ...members,
-          [room.id]: data.users,
+          [room.id]: data,
           };
       });
     });
-
-    getMessagesForRoom(room.id).then((data) => {
-      setMessages({ ...messages, [room.id]: data });
+    isMuted(room.id, connectUserId).then((data) => {
+      if (!data) {
+        getMessagesForRoom(room.id).then((data) => {
+          setMessages({ ...messages, [room.id]: data });
+        });
+      }
     });
+    
   };
 
   const formatTime = (time: string) => {
@@ -243,8 +269,7 @@ function Chat() {
       };
     });
     }
-  const [toggleMuteTime, setToggleMuteTime] = useState(false);
-  const [muteTime, setMuteTime] = useState(0);
+
 
   // ban user (for always)
   const banUser = () => {
@@ -253,18 +278,28 @@ function Chat() {
     }
   }
   // mute user (he can not see messages until a limited time)
-  const muteUser = () => {
-    setToggleMuteTime(true)
+
+  const muteUser = (e: any) => {
+    console.log("muteTime", muteTime)
+    e.preventDefault();
     if (selectedMember) {
       socket!.emit("muteUser", {roomId: selectedRoom?.id, userId: selectedMember.id, duration: muteTime})
     }
+    setMuted("Unmute")
+    setToggleMuteButton(false)
+  }
+   const handleToggleMute = () => {
+    setToggleMuteButton(!toggleMuteButton)
+    if (muted === "Unmute") {
+      socket!.emit("unmuteUser", {roomId: selectedRoom?.id, userId: selectedMember?.id})
+      setMuted("Mute")
+    }
   }
 
-  const timeOptions = [
-    { value: 1, label: '1 minute' },
-    { value: 5, label: '5 minutes' },
-    { value: 10, label: '10 minutes' },
-  ];
+  const handleChangeMuteTime =(e: any)=> {
+    setMuteTime(Number(e.target.value))
+  }
+
   const setAdmin = () => {
     console.log("selectedMember", selectedMember)
   }
@@ -393,7 +428,7 @@ function Chat() {
       </Box>
       {/* CHAT ROOM */}
       {
-        selectedRoom &&
+        selectedRoom && 
         <Box sx={{
           display: showRoomContent ? "flex" : "none",
           justifyContent: "space-between",
@@ -450,20 +485,30 @@ function Chat() {
                   <Box sx={{}}>
                     <Typography variant="h5"> {selectedMember.username} </Typography>
                     <Button variant="outlined" onClick={banUser}>Ban</Button>
-                    <Button variant="outlined" onClick={muteUser}>Mute</Button>
+                    <Button variant="outlined" onClick={handleToggleMute}>{muted}</Button>
                     <Button variant="outlined" onClick={setAdmin}>Set Admin</Button>
                   </Box>
                   {
-                    toggleMuteTime && (
-                      <Select value={muteTime} onChange={(e)=> setMuteTime(Number(e.target.value))}>
-                      {
-                        timeOptions.map((timeOption: any) => {
-                          return (
-                            <MenuItem value={timeOption.value}>{timeOption.label}</MenuItem>
-                          );
-                        })
-                      }
-                    </Select>
+                    toggleMuteButton && muted == "Mute" && (
+                      <form onSubmit={muteUser}>
+                      <FormControl style={{marginTop: "10px"}} fullWidth>
+                        <InputLabel id="duration">Duration</InputLabel>
+                        <Select
+                          label="Duration"
+                          value={muteTime}
+                          labelId="duration"
+                          onChange={handleChangeMuteTime}>
+                        {
+                          timeOptions.map((timeOption: any, index: any) => {
+                            return (
+                              <MenuItem key={index} value={timeOption.value} >{timeOption.label}</MenuItem>
+                            );
+                          })
+                        }
+                      </Select>
+                      </FormControl>
+                      <Button type="submit" variant="contained">Mute</Button>
+                      </form>
                     )
                   }
                 </Box>

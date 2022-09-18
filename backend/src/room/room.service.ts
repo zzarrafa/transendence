@@ -14,7 +14,7 @@ export class RoomService {
                 type: room.type,
                 isPrivate: room.isPrivate,
                 password: room.password
-            }
+            },
         });
         await this.membershipService.createMembership(newRoom.id, creatorId);
         await this.membershipService.updateRole(newRoom.id, creatorId, 2);
@@ -22,6 +22,7 @@ export class RoomService {
         {
             await this.membershipService.createMembership(newRoom.id, userId);
         }
+        return newRoom;
     }
     
     async getAllRooms() {

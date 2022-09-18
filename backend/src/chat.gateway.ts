@@ -48,16 +48,16 @@ export class ChatGateway implements OnGatewayInit {
 
   @SubscribeMessage("createMessage")
   async handleCreateMessage(client: Socket, payload: { content: string; room: number; user: number }) {
-    let isMember = await this.membershipService.isMember(payload.room, payload.user);
-      if(isMember) {
+    const isMuted = await this.membershipService.isMuted(payload.room, payload.user);
+      if(!isMuted) {
         this.messageService.createMessage(payload).then(() => {
           this.messageService.getMessagesForRoom(payload.room).then(async(messages) => {
             let userId:number;
             for(let x of this.connections)
             {
                 userId = JSON.parse(x.handshake.query.user as string).id;
-                isMember = await this.membershipService.isMember(payload.room, userId);
-                if(isMember) {
+                const isMuted = await this.membershipService.isMuted(payload.room, userId);
+                if(!isMuted) {
                   this.server.to(x.id).emit('messages', {messages: messages, room: payload.room});
                 }
             }
@@ -129,50 +129,77 @@ export class ChatGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage("banUser")
-  handleBanUser(client: Socket, payload: { roomId: number; userId: number}) {
+  async handleBanUser(client: Socket, payload: { roomId: number; userId: number}) {
     let userId: number;
     let members: any;
     let userRooms: any;
     let allRooms: any;
-    this.membershipService.banUser(payload.roomId, payload.userId).then(async () => {
-
-      for(let x of this.connections)
-      {
-        userId = JSON.parse(x.handshake.query.user as string).id;
-        userRooms = await this.membershipService.getRoomsForUser(userId);
-        members = await this.membershipService.getMembersForRoom(payload.roomId);
-        allRooms = await this.roomService.getAllRooms();
-        allRooms = allRooms.filter((r) => !r.users.find((u) => u.userId === userId) && !r.isPrivate && r.type !== "DM");
-        this.server.to(x.id).emit('rooms', userRooms);
-        this.server.to(x.id).emit('allRooms', allRooms);
-        this.server.to(x.id).emit('members', {members: members, roomId: payload.roomId});
-      }
-    });
+    const role = await this.membershipService.getRole(payload.roomId, this.currentUser.id);
+    const userRole = await this.membershipService.getRole(payload.roomId, payload.userId);
+    if (role > userRole) {
+      this.membershipService.banUser(payload.roomId, payload.userId).then(async () => {
+        for(let x of this.connections)
+        {
+          userId = JSON.parse(x.handshake.query.user as string).id;
+          userRooms = await this.membershipService.getRoomsForUser(userId);
+          members = await this.membershipService.getMembersForRoom(payload.roomId);
+          allRooms = await this.roomService.getAllRooms();
+          allRooms = allRooms.filter((r) => !r.users.find((u) => u.userId === userId) && !r.isPrivate && r.type !== "DM");
+          this.server.to(x.id).emit('rooms', userRooms);
+          this.server.to(x.id).emit('allRooms', allRooms);
+          this.server.to(x.id).emit('members', {members: members, roomId: payload.roomId});
+        }
+      });
+    }
+    else {
+      this.server.to(client.id).emit('error', "You can't ban this user");
+    }
   }
 
+  //  mt9drch tsyft msg hta twalli unmute
   @SubscribeMessage("muteUser")
-  handleMuteUser(client: Socket, payload: { roomId: number; userId: number, mute: boolean, duration: number}) {
+  async handleMuteUser(client: Socket, payload: { roomId: number; userId: number, duration: number}) {
     let userId: number;
     let members: any;
-    let userRooms: any;
-    let allRooms: any;
-    this.membershipService.updateMuted(payload.roomId, payload.userId, payload.mute).then(async () => {
+    const role = await this.membershipService.getRole(payload.roomId, this.currentUser.id);
+    const userRole = await this.membershipService.getRole(payload.roomId, payload.userId);
+    if (role > userRole) {
+      this.membershipService.updateMuted(payload.roomId, payload.userId, true).then(async () => {
 
-      for(let x of this.connections)
-      {
-        userId = JSON.parse(x.handshake.query.user as string).id;
-        userRooms = await this.membershipService.getRoomsForUser(userId);
-        members = await this.membershipService.getMembersForRoom(payload.roomId);
-        allRooms = await this.roomService.getAllRooms();
-        allRooms = allRooms.filter((r) => !r.users.find((u) => u.userId === userId) && !r.isPrivate && r.type !== "DM");
-        this.server.to(x.id).emit('rooms', userRooms);
-        this.server.to(x.id).emit('allRooms', allRooms);
-        this.server.to(x.id).emit('members', {members: members, roomId: payload.roomId});
-        // setTimeout(function, milliseconds); (duration en minute)
-        setTimeout(() => {
-          this.server.to(x.id).emit('unmute-user', {roomId: payload.roomId, userId: payload.userId});
-        }, payload.duration * 60 * 1000);
-      }
-    });
+        for(let x of this.connections)
+        {
+          userId = JSON.parse(x.handshake.query.user as string).id;
+          members = await this.membershipService.getMembersForRoom(payload.roomId);
+          this.server.to(x.id).emit('members', {members: members, roomId: payload.roomId});
+          setTimeout(() => {
+            this.server.to(x.id).emit('unmuteUser', {roomId: payload.roomId, userId: payload.userId});
+          }, payload.duration * 60 * 1000);
+        }
+      });
+    }
+    else
+    {
+      this.server.to(client.id).emit('error', "You don't have permission to mute this user");
+    }
+  }
+
+  @SubscribeMessage("unmuteUser")
+  async handleUnmuteUser(client: Socket, payload: { roomId: number; userId: number}) {
+    let members: any;
+    const role = await this.membershipService.getRole(payload.roomId, this.currentUser.id);
+    const userRole = await this.membershipService.getRole(payload.roomId, payload.userId);
+    if (role > userRole) {
+      this.membershipService.updateMuted(payload.roomId, payload.userId, false).then(async () => {
+        for(let x of this.connections)
+        {
+          members = await this.membershipService.getMembersForRoom(payload.roomId);
+          this.server.to(x.id).emit('members', {members: members, roomId: payload.roomId});
+        }
+      });
+    }
+    else
+    {
+      this.server.to(client.id).emit('error', "You don't have permission to unmute this user");
+    }
   }
 }

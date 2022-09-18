@@ -21,20 +21,20 @@ export class MembershipService {
         return membership;
     }
 
-    async getMembership(roomId: number, userId: number) {
+    async getMembership(roomId: any, userId: any) {
         return this.prisma.membership.findMany({
             where: {
-               roomId: roomId,
-               userId: userId,
+               roomId: parseInt(roomId),
+               userId: parseInt(userId),
             },
         });
     }
 
-    async deleteMembership(roomId: number, userId: number) {
+    async deleteMembership(roomId: any, userId: any) {
         return this.prisma.membership.deleteMany({
             where: {
-                roomId: roomId,
-                userId: userId,
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
             },
         });
     }
@@ -49,7 +49,6 @@ export class MembershipService {
                 room: true,
             },
         });
-        console.log(tmpRooms);
         let rooms = [];
         for (let i = 0; i < tmpRooms.length; i++) {
             rooms[i] = tmpRooms[i].room;
@@ -57,11 +56,11 @@ export class MembershipService {
         return rooms;
     }
 
-    async isMember(roomId: number, userId: number) {
+    async isMember(roomId: any, userId: any) {
          const membership = await this.prisma.membership.findMany({
             where: {
-                roomId: roomId,
-                userId: userId,
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
                 isBanned: false,
             },
         });
@@ -71,19 +70,29 @@ export class MembershipService {
         return true;
     }
 
-    async getMembersForRoom(roomId: number) {
-        return this.prisma.membership.findMany({
+    async getMembersForRoom(roomId: any) {
+        const tmpMembers = await this.prisma.membership.findMany({
             where: {
-               roomId: roomId,
+                roomId: parseInt(roomId),
+                isBanned: false,
+            },
+            include: {
+                user: true,
             },
         });
+        let members = [];
+        for (let i = 0; i < tmpMembers.length; i++) {
+            members[i] = tmpMembers[i].user;
+        }
+        return members;
     }
 
-    async updateRole(roomId: number, userId: number, role: number) {
+    async updateRole(roomId: any, userId: any, role: number) {
+        console.log(roomId, userId, role);
         return this.prisma.membership.updateMany({
             where: {
-                roomId: roomId,
-                userId: userId,
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
             },
             data: {
                 role: role,
@@ -103,16 +112,44 @@ export class MembershipService {
         });
     }
 
-    async updateMuted(roomId: number, userId: number, isMuted: boolean) {
+    async updateMuted(roomId: any, userId: any, isMuted: boolean) {
         return this.prisma.membership.updateMany({
             where: {
-                roomId: roomId,
-                userId: userId,
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
             },
             data: {
                 isMuted: isMuted,
             },
         });
+    }
+
+    async isMuted(roomId: any, userId: any) {
+        const membership = await this.prisma.membership.findMany({
+            where: {
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
+                isMuted: true,
+                isBanned: false,
+            },
+        });
+        if (membership.length === 0) {
+            return false;
+        }
+        return true;
+    }
+
+    async getRole(roomId: any, userId: any) {
+        const membership = await this.prisma.membership.findMany({
+            where: {
+                roomId: parseInt(roomId),
+                userId: parseInt(userId),
+            },
+        });
+        if (membership.length === 0) {
+            return -1;
+        }
+        return membership[0].role;
     }
    
 }

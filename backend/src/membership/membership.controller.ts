@@ -35,19 +35,27 @@ export class MembershipController {
     async getMembers(@Param('roomId') roomId: number) {
         return this.membershipService.getMembersForRoom(roomId);
     }
-
-    @Post('/ban')
-    async banUser(@Body() roomId: number, @Body() userId: number) {
-        return this.membershipService.banUser(roomId, userId);
-    }
-
-    @Post('/updateRole')
-    async updateRole(@Body() roomId: number, @Body() userId: number, @Body() role: number) {
+    
+    @Post('/updateRole/:roomId/:userId')
+    async updateRole(@Param('roomId') roomId: number, @Param('userId') userId: number, @Body('role') role: number) {
         return this.membershipService.updateRole(roomId, userId, role);
     }
 
-    @Post('/updateMute')
-    async updateMute(@Body() roomId: number, @Body() userId: number, @Body() isMuted: boolean) {
+    @Post('/ban')
+    async banUser(@Body('roomId') roomId: number, @Body('userId') userId: number) {
+        return this.membershipService.banUser(roomId, userId);
+    }
+
+
+    @Post('/updateMute/:roomId/:userId')
+    async updateMute(@Param('roomId') roomId: number, @Param('userId') userId: number, @Body('isMuted') isMuted: boolean) {
         return this.membershipService.updateMuted(roomId, userId, isMuted);
     }
+
+    // isMuted
+    @Get('/isMuted/:roomId/:userId')
+    async isMuted(@Param('roomId') roomId: any, @Param('userId') userId: any) {
+        return this.membershipService.isMuted(roomId, userId);
+    }
+
 }

@@ -48,10 +48,18 @@ async function banUser(roomId: number, userId: number) {
     return data;
 }
 
+async function isMuted(roomId: number, userId: number) {
+    const response = await fetch(`${apiUrl}membership/isMuted/${roomId}/${userId}`);
+    const data = await response.json();
+    console.log("isMuted", data);
+    return data;
+}
+
 export {
     getRoomsForUser,
     createRoom,
     getRoomById,
     getMembers,
-    banUser
+    banUser,
+    isMuted
 }

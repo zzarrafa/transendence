@@ -10,8 +10,8 @@ import { UserService } from './User/user/user.service';
 import { UserModule } from './User/user/user.module';
 import { TwoFactService } from './twofactorAuth/two-fact/two-fact.service';
 import { TwoFactModule } from './twofactorAuth/two-fact/two-fact.module';
-import { RequestModule } from './Relationship/request/request.module';
-import { RequestService } from './Relationship/request/request.service';
+import { RequestModule } from './Friendship/request/request.module';
+import { RequestService } from './Friendship/request/request.service';
 import { UserGateway } from './User/user/user.gateway';
 @Module({
   imports: [
@@ -27,6 +27,6 @@ import { UserGateway } from './User/user/user.gateway';
     RequestModule,
   ],
   controllers: [AppController],
-  providers: [LoginService, JwtService, UserService, TwoFactService, RequestService],
+  providers: [LoginService, JwtService, UserService, TwoFactService, RequestService, UserGateway],
 })
 export class AppModule {}

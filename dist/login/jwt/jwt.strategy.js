@@ -20,10 +20,17 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([(request) => {
                     let data = request === null || request === void 0 ? void 0 : request.headers.cookie;
-                    if (data.includes(';')) {
-                        data = data.split(';').find(c => c.trim().startsWith('Authentication='));
-                        data = data.split('=')[1];
-                        return data;
+                    if (data) {
+                        if (data.includes(';')) {
+                            data = data.split(';').find(c => c.trim().startsWith('Authentication='));
+                            data = data.split('=')[1];
+                            return data;
+                        }
+                        else {
+                            data = data.split('=')[1];
+                            console.log('data===', data);
+                            return data;
+                        }
                     }
                 }]),
             secretOrKey: config.get('JWT_SECRET'),

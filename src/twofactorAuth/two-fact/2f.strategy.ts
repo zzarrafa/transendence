@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { UserService } from 'src/User/user/user.service';
-import TokenPayload from 'src/tokenPayload.interface';
+import TokenPayload from 'src/login/jwt/tokenPayload.interface';
 
  
 @Injectable()

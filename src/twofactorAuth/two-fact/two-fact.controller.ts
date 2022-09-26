@@ -12,14 +12,12 @@ import {
 import {UnauthorizedException} from '@nestjs/common';
 import { TwoFactService } from './two-fact.service';
 import { Response } from 'express';
-import { User } from '@prisma/client';
 import { JwtGuard } from 'src/login/guards/jwt.guard';
 import { UserService } from 'src/User/user/user.service';
 import { LoginService } from 'src/login/login.service';
 import { Userr } from 'src/login/decorators/user.decorator';
 import { Profile } from 'passport-42';
 import { TwoFactorAuthenticationCodeDto } from 'src/login/dto';
-import { FtOauthGuard } from 'src/login/guards/ft-oauth.guard';
 
 
 @Controller('2fa')
@@ -29,6 +27,7 @@ export class TwoFactController {
   
     
   ) { }
+  //generate qr code
 @UseGuards(JwtGuard)
   @Get('generate')
   async register(@Res() response: Response, @Req() request) {
@@ -38,6 +37,7 @@ export class TwoFactController {
     console.log('===>', user.id);
     return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
   }
+  // to enable two factor authentication for the first time
 @UseGuards(JwtGuard)
   @Post('enable')
   async turnOnTwoFactorAuthentication(
@@ -45,10 +45,8 @@ export class TwoFactController {
     @Body()  twoFactorAuthenticationCode
   ) {
     const secret = request.user.twoFactorAuthenticationSecret;
-    // console.log('===>',  twoFactorAuthenticationCode['code'], secret);
     const isCodeValid =  await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode['code'], secret);
-    // console.log('===> valid ',isCodeValid);
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
@@ -61,7 +59,7 @@ fun()
 {
   return;
 }
-
+//  to autenticate users if they have alredy enabled 2fa
   @Post('authenticate')
   async authenticate( @Userr() user: Profile, @Body() code:TwoFactorAuthenticationCodeDto, @Req() request) {
     console.log(code);

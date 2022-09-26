@@ -5,7 +5,7 @@ export declare class RequestService {
     constructor(prisma: PrismaService);
     addFriend(user: User, friendId: number): Promise<User>;
     removeFriend(user: User, friendId: number): Promise<User>;
-    getFriends(user: User): Promise<{
+    getFriends(userid: number): Promise<{
         friends: User[];
     }>;
 }

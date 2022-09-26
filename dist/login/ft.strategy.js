@@ -19,7 +19,7 @@ let FtStrategy = class FtStrategy extends (0, passport_1.PassportStrategy)(passp
         super({
             clientID: config.get('clientID'),
             clientSecret: config.get('clientSecret'),
-            callbackURL: 'http://localhost:3000/login/42/return',
+            callbackURL: 'http://localhost:3000/42/return',
             passReqToCallback: true,
         });
     }

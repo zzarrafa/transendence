@@ -1,22 +1,19 @@
 import { Injectable, ForbiddenException , Req, Res} from '@nestjs/common';
 import { PrismaService } from "src/prisma/prisma.service";
-import { LogDto } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Userr } from './decorators/user.decorator';
 import { Profile } from 'passport-42';
-import { Request, Response } from 'express';
-import { User, Prisma } from '@prisma/client';
-import TokenPayload from 'src/tokenPayload.interface';
-import { UserService } from 'src/User/user/user.service';
-import { UserStatus } from 'src/User/user/user_status.enum';
+import TokenPayload from 'src/login/jwt/tokenPayload.interface';
+
+
 // import { request } from 'http';
 
 @Injectable()
 export class LoginService {
-    constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService , private userService : UserService) {}
+    constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService ) {}
 
-    async login(logDto: LogDto, @Userr() userr: Profile, @Req()request, @Res() res) {
+    async login( @Userr() userr: Profile, @Req()request, @Res() res) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -36,8 +33,8 @@ export class LoginService {
             const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
             }
-            // const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
-            // request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+        
+      
         }
         else {
           // console.log("not here!");
@@ -45,12 +42,15 @@ export class LoginService {
                   data: {
                     email: userr.emails[0].value,
                     displayName: '',
-                    picture:  userr.photos[0].value,
-                    level: 0,
+                    fullName: userr.displayName,
+                    avatar:  userr.photos[0].value,
+                    XpPoints: 0,
                     status: '',
                     wins: 0,
+                    globaRank: 0,
+                    cover: '',
                     loses: 0,
-                    role: 'player',
+                    draws: 0,
                     twoFactorAuthenticationSecret: '',
                     isTwoFactorAuthenticationEnabled: false
                 },
@@ -70,31 +70,8 @@ export class LoginService {
         isSecondFactorAuthenticated };
         const token = await this.jwt.signAsync(payload, {
           secret: this.config.get('JWT_SECRET'),
-          expiresIn: '30m',
+          expiresIn: '7d',
         });
         return token;
       }
     }
-    
-    
-    
-    
-    // async signToken(userId: number,displayName: string,): Promise<{ access_token: string }> {
-    //     const payload = {
-    //       sub: userId,
-    //       displayName,
-    //     };
-    //     const secret = this.config.get('JWT_SECRET');
-    
-    //     const token = await this.jwt.signAsync(
-    //       payload,
-    //       {
-    //         expiresIn: '30m',
-    //         secret: secret,
-    //       },
-    //     );
-        
-    //     return {
-    //       access_token: token,
-    //     };
-    //   }

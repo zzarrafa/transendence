@@ -23,7 +23,11 @@ let UserService = class UserService {
         return await this.prisma.user.findMany({
             select: {
                 displayName: true,
-                email: true,
+                XpPoints: true,
+                avatar: true,
+                wins: true,
+                loses: true,
+                draws: true,
             },
         });
     }
@@ -81,6 +85,17 @@ let UserService = class UserService {
         }
         return user.wins;
     }
+    async getDraws(id) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('user not found');
+        }
+        return user.draws;
+    }
     async getLoses(id) {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -92,7 +107,7 @@ let UserService = class UserService {
         }
         return user.loses;
     }
-    async getLevel(id) {
+    async getXp(id) {
         const user = await this.prisma.user.findUnique({
             where: {
                 id,
@@ -101,7 +116,7 @@ let UserService = class UserService {
         if (!user) {
             throw new common_1.NotFoundException('user not found');
         }
-        return user.level;
+        return user.XpPoints;
     }
     async updateStatus(id, status) {
         const user = await this.prisma.user.update({
@@ -114,16 +129,52 @@ let UserService = class UserService {
         });
         return user;
     }
-    async updaatepicture(id, picture) {
+    async updaatepicture(id, avatar) {
         const user = await this.prisma.user.update({
             where: {
                 id,
             },
             data: {
-                picture,
+                avatar,
             },
         });
         return user;
+    }
+    async incrementWins(id) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                wins: {
+                    increment: 1,
+                },
+            },
+        });
+    }
+    async incrementDraws(id) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                draws: {
+                    increment: 1,
+                },
+            },
+        });
+    }
+    async incrementLoses(id) {
+        const user = await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                loses: {
+                    increment: 1,
+                },
+            },
+        });
     }
     async setTwoFactorAuthenticationSecret(secret, userId) {
         return await this.prisma.user.update({

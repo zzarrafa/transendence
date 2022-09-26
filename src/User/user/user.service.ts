@@ -1,6 +1,6 @@
 import { Injectable , UnauthorizedException, NotFoundException} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User , Prisma } from '@prisma/client';
+import { User  } from '@prisma/client';
 import {JwtService} from '@nestjs/jwt';
 import { UserStatus } from './user_status.enum';
 @Injectable()
@@ -13,12 +13,16 @@ export class UserService {
         return await this.prisma.user.findMany({
             select: {
                 displayName: true,
-                email: true,
+                XpPoints: true,
+                avatar: true,
+                wins: true,
+                loses: true,
+                draws: true,
             },
         });
 }
 
-async getUserById(id: number) {
+async getUserById(id: number) : Promise<User> {
     const user = await this.prisma.user.findUnique({
         where: {
             id,
@@ -75,6 +79,17 @@ async getWins(id: number) {
     }
     return user.wins;
 }
+async getDraws(id: number) {
+    const user = await this.prisma.user.findUnique({
+        where: {
+            id,
+        },
+    });
+    if (!user) {
+        throw new NotFoundException('user not found');
+    }
+    return user.draws;
+}
 async getLoses(id: number) {
     const user = await this.prisma.user.findUnique({
         where: {
@@ -86,7 +101,7 @@ async getLoses(id: number) {
     }
     return user.loses;
 }
-async getLevel(id: number) {
+async getXp(id: number) {
     const user = await this.prisma.user.findUnique({
         where: {
             id,
@@ -95,7 +110,7 @@ async getLevel(id: number) {
     if (!user) {
         throw new NotFoundException('user not found');
     }
-    return user.level;
+    return user.XpPoints;
 }
 
 async updateStatus(id: number, status: UserStatus) {
@@ -110,19 +125,57 @@ async updateStatus(id: number, status: UserStatus) {
     return user;
 }
 
-async updaatepicture(id: number, picture: string) {
+async updaatepicture(id: number, avatar: string) {
     const user = await this.prisma.user.update({
         where: {
             id,
         },
         data: {
-            picture,
+            avatar,
         },
     });
     return user;
 }
 
-// update win and loses
+// increment wins
+async incrementWins(id: number) {
+    
+    const user = await this.prisma.user.update({
+        where: {
+            id,
+        },
+        data: {
+            wins: {
+                increment: 1,
+            },
+        },
+    });
+}
+// increment draws
+async incrementDraws(id: number) {
+    const user = await this.prisma.user.update({
+        where: {
+            id,
+        },
+        data: {
+            draws: {
+                increment: 1,
+            },
+        },
+    });
+}
+async incrementLoses(id: number) {
+    const user = await this.prisma.user.update({
+        where: {
+            id,
+        },
+        data: {
+            loses: {
+                increment: 1,
+            },
+        },
+    });
+}
 
 
 

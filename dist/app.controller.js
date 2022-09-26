@@ -17,15 +17,8 @@ exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const user_decorator_1 = require("./login/decorators/user.decorator");
 const passport_42_1 = require("passport-42");
-const axios_1 = require("@nestjs/axios");
-const login_service_1 = require("./login/login.service");
-const prisma_service_1 = require("./prisma/prisma.service");
 let AppController = class AppController {
-    constructor(httpService, loginService, prisma) {
-        this.httpService = httpService;
-        this.loginService = loginService;
-        this.prisma = prisma;
-    }
+    constructor() { }
     home(user) {
         return { user };
     }
@@ -40,7 +33,7 @@ __decorate([
 ], AppController.prototype, "home", null);
 AppController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [axios_1.HttpService, login_service_1.LoginService, prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [])
 ], AppController);
 exports.AppController = AppController;
 //# sourceMappingURL=app.controller.js.map

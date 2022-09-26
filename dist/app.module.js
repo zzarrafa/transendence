@@ -19,8 +19,9 @@ const user_service_1 = require("./User/user/user.service");
 const user_module_1 = require("./User/user/user.module");
 const two_fact_service_1 = require("./twofactorAuth/two-fact/two-fact.service");
 const two_fact_module_1 = require("./twofactorAuth/two-fact/two-fact.module");
-const request_module_1 = require("./Relationship/request/request.module");
-const request_service_1 = require("./Relationship/request/request.service");
+const request_module_1 = require("./Friendship/request/request.module");
+const request_service_1 = require("./Friendship/request/request.service");
+const user_gateway_1 = require("./User/user/user.gateway");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -38,7 +39,7 @@ AppModule = __decorate([
             request_module_1.RequestModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService, two_fact_service_1.TwoFactService, request_service_1.RequestService],
+        providers: [login_service_1.LoginService, jwt_1.JwtService, user_service_1.UserService, two_fact_service_1.TwoFactService, request_service_1.RequestService, user_gateway_1.UserGateway],
     })
 ], AppModule);
 exports.AppModule = AppModule;

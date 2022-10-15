@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request) => {
         let data = request?.headers.cookie;
-
+        if (data){
         if (data.includes(';')) 
         {
           data = data.split(';').find(c => c.trim().startsWith('Authentication='));
@@ -19,6 +19,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           // console.log('data===',data);
         return data;
       }
+      else
+      {
+        data = data.split('=')[1];
+        console.log('data===',data);
+        return data;
+      }}
         }]),
       secretOrKey: config.get('JWT_SECRET'),
     });

@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Redirect, UseGuards, Render, Req, Res} from '@nestjs/common';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
-import { LogDto } from './dto';
+
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import {LoginService} from './login.service';
 import { Userr } from './decorators/user.decorator';
@@ -11,10 +10,10 @@ import { JwtGuard } from './guards/jwt.guard';
 const logout = require('express-passport-logout');
 
 
-@Controller('login')
+@Controller()
 export class LoginController {
   constructor( private loginService: LoginService, private userService : UserService){}
-  @Get('42')
+  @Get('login')
   @UseGuards(FtOauthGuard)
   ftAuth() {
     return;
@@ -34,14 +33,15 @@ export class LoginController {
     await logout();
     //clear cookie
     request.res.clearCookie('Authentication');
+    request.res.clearCookie('connect.sid');
     console.log("logout");
   }
 
-  // hna '/login' ghir ma9dertch nbedel smia hit deja dayraha f  api url callback
+  
   @Get('42/return')
   @UseGuards(FtOauthGuard)
-  @Redirect('/')
-  login(@Body() dto: LogDto,@Userr() user: Profile, @Req() request, @Res() res) {
-    return this.loginService.login(dto,user,request, res);
+  @Render('hey')
+  login(@Userr() user: Profile, @Req() request, @Res() res) {
+    return this.loginService.login(user,request, res);
     }
 }

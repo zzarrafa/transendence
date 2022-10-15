@@ -13,7 +13,7 @@ let FtOauthGuard = class FtOauthGuard extends (0, passport_1.AuthGuard)('42') {
     async canActivate(context) {
         const activate = (await super.canActivate(context));
         const request = context.switchToHttp().getRequest();
-        await super.logIn(request);
+        await super.logIn(context.switchToHttp().getRequest());
         return activate;
     }
 };

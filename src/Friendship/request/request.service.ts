@@ -7,11 +7,11 @@ export class RequestService {
     constructor(private prisma : PrismaService, ) {}
 
     async addFriend(user : User, friendId: number) {
-        const request = await this.prisma.relationship.create({
+        const request = await this.prisma.friendship.create({
             data: {
                 receiver: friendId,
                 senderId: user.id,
-                status: 'friend',
+                Relationstatus: 'friend',
             },
     })
 
@@ -47,10 +47,10 @@ async removeFriend(user : User, friendId: number) {
 }
 
 // get friends
-async getFriends(user : User) {
+async getFriends(userid : number) {
     const friends = await this.prisma.user.findUnique({
         where: {
-            id: user.id,
+            id: userid,
         },
         select: {
             friends: true,

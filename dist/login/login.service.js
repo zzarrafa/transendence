@@ -16,20 +16,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const dto_1 = require("./dto");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const user_decorator_1 = require("./decorators/user.decorator");
 const passport_42_1 = require("passport-42");
-const user_service_1 = require("../User/user/user.service");
 let LoginService = class LoginService {
-    constructor(prisma, jwt, config, userService) {
+    constructor(prisma, jwt, config) {
         this.prisma = prisma;
         this.jwt = jwt;
         this.config = config;
-        this.userService = userService;
     }
-    async login(logDto, userr, request, res) {
+    async login(userr, request, res) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -50,12 +47,15 @@ let LoginService = class LoginService {
                 data: {
                     email: userr.emails[0].value,
                     displayName: '',
-                    picture: userr.photos[0].value,
-                    level: 0,
+                    fullName: userr.displayName,
+                    avatar: userr.photos[0].value,
+                    XpPoints: 0,
                     status: '',
                     wins: 0,
+                    globaRank: 0,
+                    cover: '',
                     loses: 0,
-                    role: 'player',
+                    draws: 0,
                     twoFactorAuthenticationSecret: '',
                     isTwoFactorAuthenticationEnabled: false
                 },
@@ -71,22 +71,22 @@ let LoginService = class LoginService {
         };
         const token = await this.jwt.signAsync(payload, {
             secret: this.config.get('JWT_SECRET'),
-            expiresIn: '30m',
+            expiresIn: '7d',
         });
         return token;
     }
 };
 __decorate([
-    __param(1, (0, user_decorator_1.Userr)()),
-    __param(2, (0, common_1.Req)()),
-    __param(3, (0, common_1.Res)()),
+    __param(0, (0, user_decorator_1.Userr)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
+    __metadata("design:paramtypes", [typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], LoginService.prototype, "login", null);
 LoginService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, user_service_1.UserService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService])
 ], LoginService);
 exports.LoginService = LoginService;
 //# sourceMappingURL=login.service.js.map

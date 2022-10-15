@@ -8,16 +8,24 @@ export declare class UserService {
     constructor(prisma: PrismaService, jwtService: JwtService);
     getAllUsers(): Promise<{
         displayName: string;
-        email: string;
+        XpPoints: number;
+        avatar: string;
+        wins: number;
+        loses: number;
+        draws: number;
     }[]>;
     getUserById(id: number): Promise<User>;
     GetUserByEmail(email: string): Promise<User>;
     UpdateDisplayName(id: number, displayName: string): Promise<User>;
     getWins(id: number): Promise<number>;
+    getDraws(id: number): Promise<number>;
     getLoses(id: number): Promise<number>;
-    getLevel(id: number): Promise<number>;
+    getXp(id: number): Promise<number>;
     updateStatus(id: number, status: UserStatus): Promise<User>;
-    updaatepicture(id: number, picture: string): Promise<User>;
+    updaatepicture(id: number, avatar: string): Promise<User>;
+    incrementWins(id: number): Promise<void>;
+    incrementDraws(id: number): Promise<void>;
+    incrementLoses(id: number): Promise<void>;
     setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<User>;
     turnOnTwoFactorAuthentication(userId: number): Promise<User>;
 }

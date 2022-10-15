@@ -16,7 +16,7 @@
             e.preventDefault();
             const code = document.getElementById('code').value;
             console.log('code node***************', code);
-            await axios.post('http://localhost:3000/2fa/signup', {
+            await axios.post('http://localhost:3000/2fa/authenticate', {
                 code
             }).then((data) => console.log(data))
             .catch((error)=>console.log(error))

@@ -52,7 +52,7 @@ __decorate([
     __metadata("design:type", socket_io_1.Namespace)
 ], UserGateway.prototype, "io", void 0);
 UserGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ namespace: 'login/42' }),
+    (0, websockets_1.WebSocketGateway)({ namespace: '/login' }),
     __metadata("design:paramtypes", [jwt_1.JwtService, config_1.ConfigService, user_service_1.UserService])
 ], UserGateway);
 exports.UserGateway = UserGateway;

@@ -15,7 +15,6 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginController = void 0;
 const common_1 = require("@nestjs/common");
-const dto_1 = require("./dto");
 const ft_oauth_guard_1 = require("./guards/ft-oauth.guard");
 const login_service_1 = require("./login.service");
 const user_decorator_1 = require("./decorators/user.decorator");
@@ -34,14 +33,15 @@ let LoginController = class LoginController {
     async logOut(request) {
         await logout();
         request.res.clearCookie('Authentication');
+        request.res.clearCookie('connect.sid');
         console.log("logout");
     }
-    login(dto, user, request, res) {
-        return this.loginService.login(dto, user, request, res);
+    login(user, request, res) {
+        return this.loginService.login(user, request, res);
     }
 };
 __decorate([
-    (0, common_1.Get)('42'),
+    (0, common_1.Get)('login'),
     (0, common_1.UseGuards)(ft_oauth_guard_1.FtOauthGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -58,17 +58,16 @@ __decorate([
 __decorate([
     (0, common_1.Get)('42/return'),
     (0, common_1.UseGuards)(ft_oauth_guard_1.FtOauthGuard),
-    (0, common_1.Redirect)('/'),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, user_decorator_1.Userr)()),
-    __param(2, (0, common_1.Req)()),
-    __param(3, (0, common_1.Res)()),
+    (0, common_1.Render)('hey'),
+    __param(0, (0, user_decorator_1.Userr)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dto_1.LogDto, typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
+    __metadata("design:paramtypes", [typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
     __metadata("design:returntype", void 0)
 ], LoginController.prototype, "login", null);
 LoginController = __decorate([
-    (0, common_1.Controller)('login'),
+    (0, common_1.Controller)(),
     __metadata("design:paramtypes", [login_service_1.LoginService, user_service_1.UserService])
 ], LoginController);
 exports.LoginController = LoginController;

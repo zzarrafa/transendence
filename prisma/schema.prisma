@@ -7,43 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  displayName String @unique
-  email String @unique
-  picture String
-  level Int 
-  status String 
-  wins Int 
-  loses Int 
-  role String 
-  twoFactorAuthenticationSecret String 
+model User {
+  id                               Int          @id @default(autoincrement())
+  displayName                      String       @unique
+  email                            String       @unique
+  fullName                         String
+  avatar                           String
+  cover                            String
+  globaRank                        Int
+  status                           String
+  wins                             Int
+  loses                            Int
+  draws                            Int
+  XpPoints                         Int
+  badges                           String[]
+  createdAt                        DateTime     @default(now())
+  twoFactorAuthenticationSecret    String
   isTwoFactorAuthenticationEnabled Boolean
-  winsHistory GameHistory[]  @relation("winner")
-  lostHistory GameHistory[] @relation("loser")
-  friends User[] @relation("friends")
-  friendOf User[] @relation("friends")
-  relationRequests Relationship[] @relation("relationRequests")
-
+  winsHistory                      Game[]       @relation("winner")
+  lostHistory                      Game[]       @relation("loser")
+  friends                          User[]       @relation("friends")
+  friendOf                         User[]       @relation("friends")
+  relationRequests                 Friendship[] @relation("relationRequests")
+  // statePermode 
 }
 
-model Relationship{
-  id Int @id @default(autoincrement())
-  receiver Int
-  sender User @relation("relationRequests", fields: [senderId], references: [id])
-  senderId Int
-  status String
+model Friendship {
+  id             Int    @id @default(autoincrement())
+  receiver       Int
+  sender         User   @relation("relationRequests", fields: [senderId], references: [id])
+  senderId       Int
+  Relationstatus String
 }
 
-
-model GameHistory {
-  id Int @id @default(autoincrement())
-  mode String
-  winner User @relation(fields : [winnerId], references : [id], name: "winner")
-  loser User @relation(fields : [loserId], references : [id] , name :"loser")
-  winnerId Int
-  loserId Int
+model Game {
+  id           Int      @id @default(autoincrement())
+  mode         String
+  winner       User     @relation(fields: [winnerId], references: [id], name: "winner")
+  loser        User     @relation(fields: [loserId], references: [id], name: "loser")
+  winnerId     Int
+  loserId      Int
   winner_score Int
-  loser_score Int 
-  createdAt DateTime @default(now())
+  loser_score  Int
+  createdAt    DateTime @default(now())
 }

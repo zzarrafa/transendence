@@ -17,11 +17,11 @@ let RequestService = class RequestService {
         this.prisma = prisma;
     }
     async addFriend(user, friendId) {
-        const request = await this.prisma.relationship.create({
+        const request = await this.prisma.friendship.create({
             data: {
                 receiver: friendId,
                 senderId: user.id,
-                status: 'friend',
+                Relationstatus: 'friend',
             },
         });
         const friend = await this.prisma.user.update({
@@ -45,10 +45,10 @@ let RequestService = class RequestService {
         });
         return friend;
     }
-    async getFriends(user) {
+    async getFriends(userid) {
         const friends = await this.prisma.user.findUnique({
             where: {
-                id: user.id,
+                id: userid,
             },
             select: {
                 friends: true,

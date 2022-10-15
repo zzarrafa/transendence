@@ -24,8 +24,6 @@ export class UserController {
         return sortedUsers;
     }
 
-
-    
     @Get('profile')
     async getProfile(@Req() request) {
          const user = await this.userService.getUserById(request.user.id);

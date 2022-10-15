@@ -16,6 +16,7 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const user_service_1 = require("./user.service");
+const jwt_guard_1 = require("../../login/guards/jwt.guard");
 const fs = require("fs");
 const multer_1 = require("multer");
 const config_1 = require("@nestjs/config");
@@ -157,6 +158,7 @@ __decorate([
 ], UserController.prototype, "updateDisplayName", null);
 UserController = __decorate([
     (0, common_1.Controller)(),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     __metadata("design:paramtypes", [user_service_1.UserService, config_1.ConfigService, request_service_1.RequestService])
 ], UserController);
 exports.UserController = UserController;

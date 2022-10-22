@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FtStrategy } from './ft.strategy';
 import { LoginController } from './login.controller';
-import { SessionSerializer } from './session.serializer';
 import { LoginService } from './login.service';
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "./jwt/jwt.strategy";
@@ -21,6 +20,6 @@ import { UserModule } from 'src/User/user/user.module';
     UserModule
   ],
   controllers: [LoginController],
-  providers: [ConfigService, FtStrategy, SessionSerializer, LoginService, JwtStrategy, UserService],
+  providers: [ConfigService, FtStrategy, LoginService, JwtStrategy, UserService],
 })
 export class LoginModule {}

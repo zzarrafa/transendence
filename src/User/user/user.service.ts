@@ -42,7 +42,7 @@ async GetUserByEmail(email: string)
         },
     });
     if (!user) {
-        throw new NotFoundException('user not found');
+        return null;
     }
     return user;
 }

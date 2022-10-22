@@ -10,9 +10,9 @@ import { Profile } from 'passport-42';
 export class AppController {
   constructor() {}
 
-  @Get()
-  @Render('home')
-  home(@Userr() user: Profile) {
-    return { user };
-  }
+  // @Get()
+  // @Render('home')
+  // home(@Userr() user: Profile) {
+  //   return { user };
+  // }
 }

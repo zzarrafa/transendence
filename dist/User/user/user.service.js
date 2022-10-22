@@ -49,7 +49,7 @@ let UserService = class UserService {
             },
         });
         if (!user) {
-            throw new common_1.NotFoundException('user not found');
+            return null;
         }
         return user;
     }

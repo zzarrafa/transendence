@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Redirect, UseGuards, Render, Req, Res} from '@nestjs/common';
+import { Body, Controller, Get, Post, Redirect, UseGuards, Render, Request,Req, Res} from '@nestjs/common';
 
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import {LoginService} from './login.service';
@@ -12,36 +12,33 @@ const logout = require('express-passport-logout');
 
 @Controller()
 export class LoginController {
-  constructor( private loginService: LoginService, private userService : UserService){}
-  @Get('login')
+  constructor( private loginService: LoginService){}
+  @Get('42/return')
   @UseGuards(FtOauthGuard)
-  ftAuth() {
-    return;
+  async login(@Request() req) {
+
+    console.log('***', req.user.isTwoFactorAuthenticationEnabled);
+    if (req.user.isTwoFactorAuthenticationEnabled) {
+      //rediret to 2fa/authenticate
+      req.res.redirect('/2fa/authenticate');
+      console.log('kk');
+      return req.user;
+    }
+    const TokenCookie =  await this.loginService.getCookieWithJwtAccessToken(req.user.id);
+    req.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+    return req.user;
   }
+ 
 
-  // @Get('42/return')
-  // @UseGuards(FtOauthGuard)
-  // @Redirect('/')
-  // ftAuthCallback(user : Profile) {
-  //   return ;
-  // }
 
-  
+
   @Get('logout')
   @UseGuards(JwtGuard)
   async logOut(@Req() request) {
     await logout();
     //clear cookie
     request.res.clearCookie('Authentication');
-    request.res.clearCookie('connect.sid');
     console.log("logout");
   }
 
-  
-  @Get('42/return')
-  @UseGuards(FtOauthGuard)
-  @Render('hey')
-  login(@Userr() user: Profile, @Req() request, @Res() res) {
-    return this.loginService.login(user,request, res);
-    }
 }

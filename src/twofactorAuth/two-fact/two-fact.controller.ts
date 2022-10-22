@@ -53,16 +53,16 @@ export class TwoFactController {
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
 
-@Get('code')
-@Render('register')
-fun()
-{
-  return;
-}
+// @Get('code')
+// @Render('register')
+// fun()
+// {
+//   return;
+// }
 //  to autenticate users if they have alredy enabled 2fa
   @Post('authenticate')
   async authenticate( @Userr() user: Profile, @Body() code:TwoFactorAuthenticationCodeDto, @Req() request) {
-    console.log(code);
+    console.log("hhhhhh");
     const users = await this.usersService.GetUserByEmail(user.emails[0].value);
     console.log('==', users.id,users.twoFactorAuthenticationSecret);
     const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid( code.code, users.twoFactorAuthenticationSecret);

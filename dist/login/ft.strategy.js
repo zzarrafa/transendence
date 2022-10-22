@@ -14,23 +14,48 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 const passport_42_1 = require("passport-42");
-let FtStrategy = class FtStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy, '42') {
-    constructor(config) {
+const user_service_1 = require("../User/user/user.service");
+const user_dto_1 = require("./dto/user.dto");
+const login_service_1 = require("./login.service");
+let FtStrategy = class FtStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy) {
+    constructor(config, userService, loginservice) {
         super({
             clientID: config.get('clientID'),
             clientSecret: config.get('clientSecret'),
             callbackURL: 'http://localhost:3000/42/return',
-            passReqToCallback: true,
         });
+        this.userService = userService;
+        this.loginservice = loginservice;
     }
-    async validate(request, accessToken, refreshToken, profile, cb) {
-        request.session.accessToken = accessToken;
-        return cb(null, profile);
+    async validate(access_token, refreshToken, profile, cb) {
+        if (!profile)
+            return null;
+        let userFound;
+        console.log('===', profile['emails'][0]['value']);
+        if (userFound = await this.userService.GetUserByEmail(profile['emails'][0]['value'])) {
+            console.log('==== imane 7eza9a');
+            return cb(null, userFound);
+        }
+        const user = new user_dto_1.CreateUserDto;
+        user.fullName = profile['displayName'];
+        user.avatar = profile['photos'][0]['value'];
+        user.email = profile['emails'][0]['value'];
+        user.status = '';
+        user.XpPoints = 0;
+        user.wins = 0;
+        user.loses = 0;
+        user.draws = 0;
+        user.twoFactorAuthenticationSecret = '';
+        user.isTwoFactorAuthenticationEnabled = false;
+        user.globaRank = 0;
+        user.cover = '';
+        user.displayName = '';
+        return cb(null, await this.loginservice.createUser(user));
     }
 };
 FtStrategy = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    (0, common_1.Controller)(),
+    __metadata("design:paramtypes", [config_1.ConfigService, user_service_1.UserService, login_service_1.LoginService])
 ], FtStrategy);
 exports.FtStrategy = FtStrategy;
 //# sourceMappingURL=ft.strategy.js.map

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <form id="my-form">
+            <!-- <input type="text" id="code"> -->
+            <button type="submit">go</button>
+
+        </form>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        async function hundleSubmit(e) {
+            e.preventDefault();
+            // const code = document.getElementById('code').value;
+            // console.log('code node***************', code);
+            await axios.get('http://localhost:3000/42/return',)
+            .catch((error)=>console.log(error))
+            // fetch('/2fa/signup', {
+            //     method: 'POST',
+            //     body: JSON.stringify({
+            //         code: code
+            //     })
+            // })
+        }
+    
+
+        var form = document.getElementById('my-form');
+        console.log('------');
+        if (form.attachEvent) {
+            console.log('------1');
+            form.attachEvent("submit", hundleSubmit);
+        } else {
+            console.log('------2');
+            form.addEventListener("submit", hundleSubmit);
+        }
+    </script>
+    
+</body>
+</html>

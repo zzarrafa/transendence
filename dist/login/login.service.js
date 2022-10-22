@@ -27,6 +27,8 @@ let LoginService = class LoginService {
         this.config = config;
     }
     async login(userr, request, res) {
+        console.log("jjjjj");
+        console.log("===>", userr.emails[0].value);
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -39,7 +41,9 @@ let LoginService = class LoginService {
             else {
                 console.log('here');
                 const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
+                console.log('==>', TokenCookie);
                 request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+                return users;
             }
         }
         else {
@@ -62,7 +66,21 @@ let LoginService = class LoginService {
             });
             const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+            return users;
         }
+    }
+    async createUser(user) {
+        const userFound = await this.prisma.user.findUnique({
+            where: {
+                email: user.email,
+            },
+        });
+        if (userFound) {
+            throw new common_1.ForbiddenException('Email already exists');
+        }
+        let newuser = await this.prisma.user.create({
+            data: user,
+        });
     }
     async getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
         const payload = {

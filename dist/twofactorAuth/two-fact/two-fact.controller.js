@@ -43,11 +43,8 @@ let TwoFactController = class TwoFactController {
         }
         await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
     }
-    fun() {
-        return;
-    }
     async authenticate(user, code, request) {
-        console.log(code);
+        console.log("hhhhhh");
         const users = await this.usersService.GetUserByEmail(user.emails[0].value);
         console.log('==', users.id, users.twoFactorAuthenticationSecret);
         const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(code.code, users.twoFactorAuthenticationSecret);
@@ -79,13 +76,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "turnOnTwoFactorAuthentication", null);
-__decorate([
-    (0, common_1.Get)('code'),
-    (0, common_1.Render)('register'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], TwoFactController.prototype, "fun", null);
 __decorate([
     (0, common_1.Post)('authenticate'),
     __param(0, (0, user_decorator_1.Userr)()),

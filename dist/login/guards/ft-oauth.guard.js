@@ -10,12 +10,6 @@ exports.FtOauthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 let FtOauthGuard = class FtOauthGuard extends (0, passport_1.AuthGuard)('42') {
-    async canActivate(context) {
-        const activate = (await super.canActivate(context));
-        const request = context.switchToHttp().getRequest();
-        await super.logIn(context.switchToHttp().getRequest());
-        return activate;
-    }
 };
 FtOauthGuard = __decorate([
     (0, common_1.Injectable)()

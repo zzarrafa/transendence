@@ -26,7 +26,7 @@ let LoginService = class LoginService {
         this.jwt = jwt;
         this.config = config;
     }
-    async login(userr, request, res) {
+    async login(userr, request) {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -34,12 +34,13 @@ let LoginService = class LoginService {
         });
         if (users) {
             if (users.isTwoFactorAuthenticationEnabled) {
-                res.redirect("http://localhost:3000/2fa/code");
+                request.res.redirect("http://localhost:3000/2fa/authenticate");
             }
             else {
                 console.log('here');
                 const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
                 request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+                return users;
             }
         }
         else {
@@ -62,6 +63,7 @@ let LoginService = class LoginService {
             });
             const TokenCookie = await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+            return users;
         }
     }
     async getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
@@ -79,9 +81,8 @@ let LoginService = class LoginService {
 __decorate([
     __param(0, (0, user_decorator_1.Userr)()),
     __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object, Object]),
+    __metadata("design:paramtypes", [typeof (_a = typeof passport_42_1.Profile !== "undefined" && passport_42_1.Profile) === "function" ? _a : Object, Object]),
     __metadata("design:returntype", Promise)
 ], LoginService.prototype, "login", null);
 LoginService = __decorate([

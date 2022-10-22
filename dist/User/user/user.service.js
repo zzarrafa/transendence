@@ -196,6 +196,16 @@ let UserService = class UserService {
             },
         });
     }
+    async turnOffTwoFactorAuthentication(userId) {
+        return await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                isTwoFactorAuthenticationEnabled: false,
+            },
+        });
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),

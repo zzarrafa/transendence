@@ -204,5 +204,16 @@ async turnOnTwoFactorAuthentication(userId: number): Promise<User>
     },
   });
 }
-}
 
+async turnOffTwoFactorAuthentication(userId: number): Promise<User>
+{
+    return await this.prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            isTwoFactorAuthenticationEnabled: false,
+        },
+    });
+}
+}

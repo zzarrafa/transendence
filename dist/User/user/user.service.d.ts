@@ -28,4 +28,5 @@ export declare class UserService {
     incrementLoses(id: number): Promise<void>;
     setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<User>;
     turnOnTwoFactorAuthentication(userId: number): Promise<User>;
+    turnOffTwoFactorAuthentication(userId: number): Promise<User>;
 }

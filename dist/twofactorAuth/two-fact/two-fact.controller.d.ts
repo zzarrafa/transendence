@@ -11,6 +11,6 @@ export declare class TwoFactController {
     constructor(twoFactorAuthenticationService: TwoFactService, usersService: UserService, loginService: LoginService);
     register(response: Response, request: any): Promise<any>;
     turnOnTwoFactorAuthentication(request: any, twoFactorAuthenticationCode: any): Promise<void>;
-    fun(): void;
+    disableTwoFactorAuthentication(request: any): Promise<void>;
     authenticate(user: Profile, code: TwoFactorAuthenticationCodeDto, request: any): Promise<import(".prisma/client").User>;
 }

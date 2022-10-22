@@ -52,13 +52,18 @@ export class TwoFactController {
     }
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
+@UseGuards(JwtGuard)
+@Post('disable')
+async disableTwoFactorAuthentication(@Req() request) {
+    await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
+  }
 
-@Get('code')
-@Render('register')
-fun()
-{
-  return;
-}
+// @Get('code')
+// @Render('register')
+// fun()
+// {
+//   return;
+// }
 //  to autenticate users if they have alredy enabled 2fa
   @Post('authenticate')
   async authenticate( @Userr() user: Profile, @Body() code:TwoFactorAuthenticationCodeDto, @Req() request) {

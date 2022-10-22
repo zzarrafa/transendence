@@ -43,8 +43,8 @@ let TwoFactController = class TwoFactController {
         }
         await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
     }
-    fun() {
-        return;
+    async disableTwoFactorAuthentication(request) {
+        await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
     }
     async authenticate(user, code, request) {
         console.log(code);
@@ -80,12 +80,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TwoFactController.prototype, "turnOnTwoFactorAuthentication", null);
 __decorate([
-    (0, common_1.Get)('code'),
-    (0, common_1.Render)('register'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('disable'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], TwoFactController.prototype, "fun", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TwoFactController.prototype, "disableTwoFactorAuthentication", null);
 __decorate([
     (0, common_1.Post)('authenticate'),
     __param(0, (0, user_decorator_1.Userr)()),

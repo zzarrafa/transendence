@@ -7,13 +7,14 @@ import { Profile } from 'passport-42';
 import TokenPayload from 'src/login/jwt/tokenPayload.interface';
 
 
+
 // import { request } from 'http';
 
 @Injectable()
 export class LoginService {
     constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService ) {}
 
-    async login( @Userr() userr: Profile, @Req()request, @Res() res) {
+    async login( @Userr() userr: Profile, @Req()request) : Promise<any> {
         const users = await this.prisma.user.findUnique({
             where: {
                 email: userr.emails[0].value,
@@ -24,7 +25,7 @@ export class LoginService {
         
             if (users.isTwoFactorAuthenticationEnabled)
             {
-              res.redirect("http://localhost:3000/2fa/code");
+              request.res.redirect("http://localhost:3000/2fa/authenticate");
             }
             else
             {
@@ -32,6 +33,7 @@ export class LoginService {
               console.log('here');
             const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
             request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+            return users;
             }
         
       
@@ -58,12 +60,9 @@ export class LoginService {
           
               const TokenCookie =  await this.getCookieWithJwtAccessToken(users.id);
               request.res.cookie('Authentication', TokenCookie, { httpOnly: true, path: '/' });
+              return users;
       }
     }
-    
-
-    
-    
     public async getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
       const payload : TokenPayload = { 
         sub : userId, 

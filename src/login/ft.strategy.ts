@@ -3,7 +3,7 @@ import { Controller, Injectable, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { User } from '@prisma/client';
-import { Strategy,  } from 'passport-42';
+import { Strategy, Profile, VerifyCallback } from 'passport-42';
 import { UserService } from 'src/User/user/user.service';
 import {UserDto } from './dto/user.dto';
 
@@ -17,10 +17,11 @@ export class FtStrategy extends PassportStrategy(Strategy) {
       clientID: config.get('clientID'),
       clientSecret: config.get('clientSecret'),
       callbackURL: 'http://localhost:3000/42/return',
+      // passReqToCallback: true,
     });
   }
 
-    async validate( profile: any, cb: any) {
+    async validate(access_token: string, refreshToken: string, profile: any, cb: any) {
 
 // console.log("===>", request);
         if (!profile)
@@ -30,13 +31,10 @@ export class FtStrategy extends PassportStrategy(Strategy) {
         if ( userFound = await this.userService.GetUserByEmail(profile['emails'][0]['value']))
         {
 
-          console.log('==== imane 7eza9a');
           return cb(null, userFound);
         }
         const user = new UserDto;
-        // print avatar
-        // console.log('avatar=====',profile['photos'][0]['value']);
-
+      
         user.fullName = profile['displayName'];
         user.avatar = profile['photos'][0]['value'];
         user.email = profile['emails'][0]['value'];

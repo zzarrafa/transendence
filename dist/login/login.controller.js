@@ -22,11 +22,10 @@ let LoginController = class LoginController {
     constructor(loginService) {
         this.loginService = loginService;
     }
-    async signUp(req) {
+    async login(req) {
         console.log('***', req.user.isTwoFactorAuthenticationEnabled);
         if (req.user.isTwoFactorAuthenticationEnabled) {
             req.res.redirect('/2fa/authenticate');
-            console.log('user existttt');
             return req.user;
         }
         const TokenCookie = await this.loginService.getCookieWithJwtAccessToken(req.user.id);
@@ -46,7 +45,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], LoginController.prototype, "signUp", null);
+], LoginController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('logout'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),

@@ -33,10 +33,9 @@ let FtStrategy = class FtStrategy extends (0, passport_1.PassportStrategy)(passp
         let userFound;
         console.log('===', profile['emails'][0]['value']);
         if (userFound = await this.userService.GetUserByEmail(profile['emails'][0]['value'])) {
-            console.log('==== imane 7eza9a');
             return cb(null, userFound);
         }
-        const user = new user_dto_1.CreateUserDto;
+        const user = new user_dto_1.UserDto;
         user.fullName = profile['displayName'];
         user.avatar = profile['photos'][0]['value'];
         user.email = profile['emails'][0]['value'];

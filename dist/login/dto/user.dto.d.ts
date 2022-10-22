@@ -1,4 +1,4 @@
-export declare class CreateUserDto {
+export declare class UserDto {
     uid: string;
     displayName: string;
     fullName: string;

@@ -21,7 +21,6 @@ export class LoginController {
     if (req.user.isTwoFactorAuthenticationEnabled) {
       //rediret to 2fa/authenticate
       req.res.redirect('/2fa/authenticate');
-      console.log('kk');
       return req.user;
     }
     const TokenCookie =  await this.loginService.getCookieWithJwtAccessToken(req.user.id);

@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const ft_strategy_1 = require("./ft.strategy");
 const login_controller_1 = require("./login.controller");
-const session_serializer_1 = require("./session.serializer");
 const login_service_1 = require("./login.service");
 const jwt_1 = require("@nestjs/jwt");
 const jwt_strategy_1 = require("./jwt/jwt.strategy");
@@ -31,7 +30,7 @@ LoginModule = __decorate([
             user_module_1.UserModule
         ],
         controllers: [login_controller_1.LoginController],
-        providers: [config_1.ConfigService, ft_strategy_1.FtStrategy, session_serializer_1.SessionSerializer, login_service_1.LoginService, jwt_strategy_1.JwtStrategy, user_service_1.UserService],
+        providers: [config_1.ConfigService, ft_strategy_1.FtStrategy, login_service_1.LoginService, jwt_strategy_1.JwtStrategy, user_service_1.UserService],
     })
 ], LoginModule);
 exports.LoginModule = LoginModule;

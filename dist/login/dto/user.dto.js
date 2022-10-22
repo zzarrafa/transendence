@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserDto = void 0;
-class CreateUserDto {
+exports.UserDto = void 0;
+class UserDto {
 }
-exports.CreateUserDto = CreateUserDto;
+exports.UserDto = UserDto;
 //# sourceMappingURL=user.dto.js.map
